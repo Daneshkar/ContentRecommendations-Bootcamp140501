@@ -1,27 +1,36 @@
+using AuthService.Domain.Base;
+
 namespace AuthService.Domain.Entities;
 
-public class RefreshToken
+public class RefreshToken : AggregateRoot, IAuditable
 {
-    public long     Id        { get; private set; }
     public long     UserId    { get; private set; }
     public string   Token     { get; private set; } = default!;
     public DateTime ExpiresAt { get; private set; }
     public bool     IsRevoked { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+
+    //  IAuditable 
+    public DateTime  CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     private RefreshToken() { }
 
-    public static RefreshToken Create(long userId, string token, DateTime expiresAt)
+    public static RefreshToken Create(long userId, string token, int expirationDays)
         => new()
         {
             UserId    = userId,
             Token     = token,
-            ExpiresAt = expiresAt,
+            ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
+            IsRevoked = false,
             CreatedAt = DateTime.UtcNow
         };
 
-    public void Revoke() => IsRevoked = true;
-
     public bool IsExpired => DateTime.UtcNow > ExpiresAt;
     public bool IsActive  => !IsRevoked && !IsExpired;
+
+    public void Revoke()
+    {
+        IsRevoked = true;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

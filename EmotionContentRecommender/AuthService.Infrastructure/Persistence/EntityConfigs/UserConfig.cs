@@ -11,10 +11,18 @@ public class UserConfig : IEntityTypeConfiguration<User>
         builder.ToTable("Users");
 
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+               .UseIdentityColumn();
 
         builder.Property(x => x.Username)
                .HasMaxLength(100)
                .IsRequired();
+
+        builder.Property(x => x.FirstName)
+               .HasMaxLength(100);
+
+        builder.Property(x => x.LastName)
+               .HasMaxLength(100);
 
         builder.Property(x => x.Email)
                .HasMaxLength(255);
@@ -25,19 +33,41 @@ public class UserConfig : IEntityTypeConfiguration<User>
         builder.Property(x => x.PasswordHash)
                .IsRequired();
 
-        builder.Property(x => x.Role)
-               .HasMaxLength(50)
-               .IsRequired();
+        builder.Property(x => x.VerifyEmail)
+               .IsRequired()
+               .HasDefaultValue(false);
+
+        builder.Property(x => x.VerifyMobile)
+               .IsRequired()
+               .HasDefaultValue(false);
 
         builder.Property(x => x.Avatar)
                .HasColumnType("nvarchar(max)");
 
-        builder.Property(x => x.CreatedAt)
-               .IsRequired();
+        builder.Property(x => x.BirthDay);
 
-        builder.HasIndex(x => x.Username).IsUnique();
+        builder.Property(x => x.Gender);
+
+        builder.Property(x => x.Role)
+               .HasMaxLength(50)
+               .IsRequired()
+               .HasDefaultValue("User");
+
+        builder.Property(x => x.Status)
+               .IsRequired()
+               .HasDefaultValue((byte)1); 
+
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.UpdatedAt);
+
+        builder.HasIndex(x => x.Username)
+               .IsUnique();
+
         builder.HasIndex(x => x.Email)
                .IsUnique()
                .HasFilter("[Email] IS NOT NULL");
+
+        builder.HasIndex(x => x.Mobile)
+               .HasFilter("[Mobile] IS NOT NULL");
     }
 }

@@ -7,11 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
-      فقط MediatR برای IDomainEvent : INotification لازم است
-      هیچ وابستگی دیگری در لایه Domain نباید وجود داشته باشد
-    -->
+    <!-- فقط MediatR برای IDomainEvent : INotification لازم است -->
     <PackageReference Include="MediatR" Version="12.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Enums\" />
   </ItemGroup>
 
 </Project>

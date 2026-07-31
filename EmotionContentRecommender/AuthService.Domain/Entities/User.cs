@@ -1,8 +1,11 @@
+using AuthService.Domain.Base;
+using AuthService.Domain.Events;
+using AuthService.Domain.Enums;
+
 namespace AuthService.Domain.Entities;
 
-public class User
+public class User : AggregateRoot, IAuditable
 {
-    public long      Id           { get; private set; }
     public string    Username     { get; private set; } = default!;
     public string?   FirstName    { get; private set; }
     public string?   LastName     { get; private set; }
@@ -15,35 +18,87 @@ public class User
     public DateOnly? BirthDay     { get; private set; }
     public byte?     Gender       { get; private set; }
     public string    Role         { get; private set; } = "User";
-    public DateTime  CreatedAt    { get; private set; }
+    public byte      Status       { get; private set; } = (byte)UserStatus.Active;
+
+    //  IAuditable 
+    public DateTime  CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     private User() { }
 
+    //  Factory Method 
     public static User Create(
-        string   username,
-        string   passwordHash,
-        string?  email     = null,
-        string?  mobile    = null,
-        string?  firstName = null,
-        string?  lastName  = null,
-        DateOnly? birthDay = null,
-        byte?    gender    = null)
-        => new()
+        string    username,
+        string    passwordHash,
+        string?   email     = null,
+        string?   mobile    = null,
+        string?   firstName = null,
+        string?   lastName  = null,
+        DateOnly? birthDay  = null,
+        byte?     gender    = null)
+    {
+        var user = new User
         {
-            Username     = username,
+            Username     = username.Trim().ToLower(),
             PasswordHash = passwordHash,
-            Email        = email,
-            Mobile       = mobile,
-            FirstName    = firstName,
-            LastName     = lastName,
+            Email        = email?.Trim().ToLower(),
+            Mobile       = mobile?.Trim(),
+            FirstName    = firstName?.Trim(),
+            LastName     = lastName?.Trim(),
             BirthDay     = birthDay,
             Gender       = gender,
+            Status       = (byte)UserStatus.Active,
             CreatedAt    = DateTime.UtcNow
         };
 
-    public void VerifyUserEmail()              => VerifyEmail  = true;
-    public void VerifyUserMobile()             => VerifyMobile = true;
-    public void ChangePassword(string newHash) => PasswordHash = newHash;
-    public void UpdateAvatar(string url)       => Avatar       = url;
-    public void MakeAdmin()                    => Role         = "Admin";
+        user.AddDomainEvent(new UserCreatedEvent(user.Username));
+        return user;
+    }
+
+    
+    public bool IsActive()   => Status == (byte)UserStatus.Active;
+    public bool IsInactive() => Status == (byte)UserStatus.Inactive;
+    public bool IsBanned()   => Status == (byte)UserStatus.Banned;
+
+    public void VerifyUserEmail()
+    {
+        VerifyEmail = true;
+        UpdatedAt   = DateTime.UtcNow;
+    }
+
+    public void VerifyUserMobile()
+    {
+        VerifyMobile = true;
+        UpdatedAt    = DateTime.UtcNow;
+    }
+
+    public void ChangePassword(string newHash)
+    {
+        PasswordHash = newHash;
+        UpdatedAt    = DateTime.UtcNow;
+    }
+
+    public void UpdateAvatar(string url)
+    {
+        Avatar    = url;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void MakeAdmin()
+    {
+        Role      = "Admin";
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Deactivate()
+    {
+        Status    = (byte)UserStatus.Inactive;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Ban()
+    {
+        Status    = (byte)UserStatus.Banned;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

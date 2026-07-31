@@ -1,5 +1,4 @@
-﻿namespace AuthService.Infrastructure.Exceptions;
-
+namespace EmotionService.Infrastructure.Exceptions;
 
 public class AppException : Exception
 {
@@ -14,19 +13,7 @@ public class NotFoundException : AppException
     public NotFoundException(string message) : base(message, 404) { }
 }
 
-
-public class UnauthorizedException : AppException
-{
-    public UnauthorizedException(string message) : base(message, 401) { }
-}
-
-
 public class ConflictException : AppException
 {
     public ConflictException(string message) : base(message, 409) { }
-}
-
-public class ForbiddenException : AppException
-{
-    public ForbiddenException(string message) : base(message, 403) { }
 }
