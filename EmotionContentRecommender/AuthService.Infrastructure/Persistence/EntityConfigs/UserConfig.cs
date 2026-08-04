@@ -41,7 +41,7 @@ public class UserConfig : IEntityTypeConfiguration<User>
                .IsRequired()
                .HasDefaultValue(false);
 
-        builder.Property(x => x.Avatar)
+        builder.Property(x => x.AvatarUser)
                .HasColumnType("nvarchar(max)");
 
         builder.Property(x => x.BirthDay);

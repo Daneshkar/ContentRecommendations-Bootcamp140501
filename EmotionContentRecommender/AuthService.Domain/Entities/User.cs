@@ -14,7 +14,7 @@ public class User : AggregateRoot, IAuditable
     public string    PasswordHash { get; private set; } = default!;
     public bool      VerifyEmail  { get; private set; }
     public bool      VerifyMobile { get; private set; }
-    public string?   Avatar       { get; private set; }
+    public string?   AvatarUser       { get; private set; }
     public DateOnly? BirthDay     { get; private set; }
     public byte?     Gender       { get; private set; }
     public string    Role         { get; private set; } = "User";
@@ -80,7 +80,7 @@ public class User : AggregateRoot, IAuditable
 
     public void UpdateAvatar(string url)
     {
-        Avatar    = url;
+        AvatarUser    = url;
         UpdatedAt = DateTime.UtcNow;
     }
 
