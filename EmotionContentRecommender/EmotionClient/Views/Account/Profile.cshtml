@@ -50,6 +50,11 @@
             </div>
 
             <div class="profile-item">
+                <span class="profile-label">تاریخ تولد</span>
+                <span class="profile-value">@(Model.BirthDay?.ToString("yyyy/MM/dd") ?? "—")</span>
+            </div>
+
+            <div class="profile-item">
                 <span class="profile-label">جنسیت</span>
                 <span class="profile-value">@Model.GenderText</span>
             </div>

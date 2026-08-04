@@ -6,19 +6,19 @@ namespace AuthService.Domain.Entities;
 
 public class User : AggregateRoot, IAuditable
 {
-    public string    Username     { get; private set; } = default!;
-    public string?   FirstName    { get; private set; }
-    public string?   LastName     { get; private set; }
-    public string?   Email        { get; private set; }
-    public string?   Mobile       { get; private set; }
-    public string    PasswordHash { get; private set; } = default!;
-    public bool      VerifyEmail  { get; private set; }
-    public bool      VerifyMobile { get; private set; }
-    public string?   AvatarUser       { get; private set; }
-    public DateOnly? BirthDay     { get; private set; }
-    public byte?     Gender       { get; private set; }
-    public string    Role         { get; private set; } = "User";
-    public byte      Status       { get; private set; } = (byte)UserStatus.Active;
+    public string     Username     { get; private set; } = default!;
+    public string?    FirstName    { get; private set; }
+    public string?    LastName     { get; private set; }
+    public string?    Email        { get; private set; }
+    public string?    Mobile       { get; private set; }
+    public string     PasswordHash { get; private set; } = default!;
+    public bool       VerifyEmail  { get; private set; }
+    public bool       VerifyMobile { get; private set; }
+    public string?    AvatarUser   { get; private set; }
+    public DateOnly?  BirthDay     { get; private set; }
+    public GenderType? Gender      { get; private set; }
+    public UserRole   Role         { get; private set; } = UserRole.User;
+    public UserStatus Status       { get; private set; } = UserStatus.Active;
 
     //  IAuditable 
     public DateTime  CreatedAt { get; private set; }
@@ -28,14 +28,14 @@ public class User : AggregateRoot, IAuditable
 
     //  Factory Method 
     public static User Create(
-        string    username,
-        string    passwordHash,
-        string?   email     = null,
-        string?   mobile    = null,
-        string?   firstName = null,
-        string?   lastName  = null,
-        DateOnly? birthDay  = null,
-        byte?     gender    = null)
+        string     username,
+        string     passwordHash,
+        string?    email     = null,
+        string?    mobile    = null,
+        string?    firstName = null,
+        string?    lastName  = null,
+        DateOnly?  birthDay  = null,
+        byte?      gender    = null)
     {
         var user = new User
         {
@@ -46,8 +46,8 @@ public class User : AggregateRoot, IAuditable
             FirstName    = firstName?.Trim(),
             LastName     = lastName?.Trim(),
             BirthDay     = birthDay,
-            Gender       = gender,
-            Status       = (byte)UserStatus.Active,
+            Gender       = gender.HasValue ? (GenderType)gender.Value : null,
+            Status       = UserStatus.Active,
             CreatedAt    = DateTime.UtcNow
         };
 
@@ -56,9 +56,9 @@ public class User : AggregateRoot, IAuditable
     }
 
     
-    public bool IsActive()   => Status == (byte)UserStatus.Active;
-    public bool IsInactive() => Status == (byte)UserStatus.Inactive;
-    public bool IsBanned()   => Status == (byte)UserStatus.Banned;
+    public bool IsActive()   => Status == UserStatus.Active;
+    public bool IsInactive() => Status == UserStatus.Inactive;
+    public bool IsBanned()   => Status == UserStatus.Banned;
 
     public void VerifyUserEmail()
     {
@@ -86,19 +86,19 @@ public class User : AggregateRoot, IAuditable
 
     public void MakeAdmin()
     {
-        Role      = "Admin";
+        Role      = UserRole.Admin;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void Deactivate()
     {
-        Status    = (byte)UserStatus.Inactive;
+        Status    = UserStatus.Inactive;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void Ban()
     {
-        Status    = (byte)UserStatus.Banned;
+        Status    = UserStatus.Banned;
         UpdatedAt = DateTime.UtcNow;
     }
 }

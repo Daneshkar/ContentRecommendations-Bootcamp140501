@@ -53,10 +53,10 @@ public class GetProfileQueryHandler : IRequestHandler<GetProfileQuery, ApiResult
             VerifyEmail:  user.VerifyEmail,
             Mobile:       user.Mobile,
             VerifyMobile: user.VerifyMobile,
-            Gender:       user.Gender,
+            Gender:       (byte?)user.Gender,
             BirthDay:     user.BirthDay,
             AvatarUser:   user.AvatarUser,
-            Role:         user.Role);
+            Role:         user.Role.ToString());
 
         return ApiResult<ProfileResponse>.Success(profile, "اطلاعات پروفایل با موفقیت دریافت شد.");
     }

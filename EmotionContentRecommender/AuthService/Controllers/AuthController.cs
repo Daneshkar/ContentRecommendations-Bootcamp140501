@@ -48,7 +48,6 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ApiResult<RefreshTokenResponse>), 401)]
     public async Task<IActionResult> Refresh(CancellationToken ct)
     {
-        // Refresh Token از Cookie خوانده می‌شود
         var refreshToken = Request.Cookies["refresh_token"];
 
         var result = await _mediator.Send(

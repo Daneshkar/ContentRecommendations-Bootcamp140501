@@ -59,7 +59,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResult<Login
         SetAuthCookies(accessToken, rawRefresh);
 
         return ApiResult<LoginResponse>.Success(
-            new LoginResponse(user.Id, user.Username, user.Role),
+            new LoginResponse(user.Id, user.Username, user.Role.ToString()),
             "ورود موفقیت‌آمیز بود.");
     }
 

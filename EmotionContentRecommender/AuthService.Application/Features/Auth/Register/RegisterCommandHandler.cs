@@ -51,6 +51,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiResult
             mobile:       request.Mobile,
             firstName:    request.FirstName,
             lastName:     request.LastName,
+            birthDay:     request.BirthDay,
             gender:       request.Gender);
 
         _db.Users.Add(user);

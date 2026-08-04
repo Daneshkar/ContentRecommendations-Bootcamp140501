@@ -31,7 +31,7 @@ public class JwtService : IJwtService
             new Claim(JwtRegisteredClaimNames.Sub,  user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Name, user.Username),
             new Claim(ClaimTypes.NameIdentifier,    user.Id.ToString()),
-            new Claim(ClaimTypes.Role,              user.Role),
+            new Claim(ClaimTypes.Role,              user.Role.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti,  Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat,
                 DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
