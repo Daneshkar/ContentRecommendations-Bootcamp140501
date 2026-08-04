@@ -1,0 +1,70 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "ثبت‌نام";
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>ثبت‌نام در Emotion</h2>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-error">@ViewBag.Error</div>
+        }
+
+        <form asp-action="Register" method="post">
+            <div class="form-group">
+                <label>نام کاربری *</label>
+                <input asp-for="Username" placeholder="حداقل ۳ کاراکتر" autocomplete="username" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>نام</label>
+                    <input asp-for="FirstName" placeholder="اختیاری" />
+                </div>
+                <div class="form-group">
+                    <label>نام خانوادگی</label>
+                    <input asp-for="LastName" placeholder="اختیاری" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>ایمیل</label>
+                <input asp-for="Email" type="email" placeholder="example@domain.com" autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+                <label>شماره موبایل</label>
+                <input asp-for="Mobile" placeholder="09xxxxxxxxx" autocomplete="tel" />
+            </div>
+
+            <div class="form-group">
+                <label>جنسیت</label>
+                <select asp-for="Gender">
+                    <option value="">-- انتخاب کنید --</option>
+                    <option value="1">مرد</option>
+                    <option value="2">زن</option>
+                    <option value="3">سایر</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>رمز عبور *</label>
+                <input asp-for="Password" type="password" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password" />
+            </div>
+
+            <div class="form-group">
+                <label>تکرار رمز عبور *</label>
+                <input asp-for="ConfirmPassword" type="password" placeholder="تکرار رمز عبور" autocomplete="new-password" />
+            </div>
+
+            <button type="submit" class="btn">ثبت‌نام</button>
+        </form>
+
+        <div class="auth-links">
+            قبلاً ثبت‌نام کرده‌اید؟
+            <a asp-action="Login">وارد شوید</a>
+        </div>
+    </div>
+</div>

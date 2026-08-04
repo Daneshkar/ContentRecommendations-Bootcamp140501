@@ -3,6 +3,7 @@ using System.Text.Json;
 using AuthService.Infrastructure.Exceptions;
 using AuthService.Infrastructure.Jwt;
 using AuthService.Infrastructure.Persistence;
+using AuthService.Infrastructure.Sms;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -105,6 +106,11 @@ public static class InfrastructureServiceExtensions
             });
 
         services.AddAuthorization();
+
+        services.Configure<KavenegarSettings>(
+            configuration.GetSection(KavenegarSettings.SectionName));
+
+        services.AddHttpClient<ISmsService, KavenegarSmsService>();
 
         return services;
     }

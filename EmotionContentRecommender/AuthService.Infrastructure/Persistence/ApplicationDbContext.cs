@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User>   Users  => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<OtpCode> OtpCodes => Set<OtpCode>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
