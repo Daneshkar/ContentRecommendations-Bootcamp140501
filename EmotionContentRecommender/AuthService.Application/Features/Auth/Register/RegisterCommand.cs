@@ -12,6 +12,7 @@ public record RegisterCommand(
     string?   Mobile,
     string?   FirstName,
     string?   LastName,
+    DateOnly? BirthDay,
     byte?     Gender)
     : IRequest<ApiResult<RegisterResponse>>;
 
@@ -46,5 +47,14 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
         RuleFor(x => x.Gender)
             .InclusiveBetween((byte)1, (byte)3).WithMessage("مقدار جنسیت معتبر نیست.")
             .When(x => x.Gender.HasValue);
+
+        RuleFor(x => x.BirthDay)
+            .Must(d => d <= DateOnly.FromDateTime(DateTime.UtcNow))
+            .WithMessage("تاریخ تولد نمی‌تواند در آینده باشد.")
+            .When(x => x.BirthDay.HasValue);
+
+        RuleFor(x => x)
+            .Must(x => !string.IsNullOrEmpty(x.Email) || !string.IsNullOrEmpty(x.Mobile))
+            .WithMessage("حداقل یکی از ایمیل یا شماره موبایل باید وارد شود.");
     }
 }

@@ -72,7 +72,7 @@ public class RefreshTokenCommandHandler
         });
 
         return ApiResult<RefreshTokenResponse>.Success(
-            new RefreshTokenResponse(user.Username, user.Role),
+            new RefreshTokenResponse(user.Username, user.Role.ToString()),
             "توکن با موفقیت تمدید شد.");
     }
 }

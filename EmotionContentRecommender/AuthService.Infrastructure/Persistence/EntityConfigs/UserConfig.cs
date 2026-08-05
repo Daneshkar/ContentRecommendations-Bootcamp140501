@@ -1,4 +1,5 @@
 using AuthService.Domain.Entities;
+using AuthService.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -46,16 +47,19 @@ public class UserConfig : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.BirthDay);
 
-        builder.Property(x => x.Gender);
+        builder.Property(x => x.Gender)
+               .HasConversion<byte>();
 
         builder.Property(x => x.Role)
                .HasMaxLength(50)
                .IsRequired()
-               .HasDefaultValue("User");
+               .HasDefaultValue(UserRole.User)
+               .HasConversion<string>();
 
         builder.Property(x => x.Status)
                .IsRequired()
-               .HasDefaultValue((byte)1); 
+               .HasDefaultValue(UserStatus.Active)
+               .HasConversion<byte>();
 
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.UpdatedAt);
