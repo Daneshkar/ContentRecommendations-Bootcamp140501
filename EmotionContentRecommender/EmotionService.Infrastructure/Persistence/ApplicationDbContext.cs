@@ -11,7 +11,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Mood> Moods => Set<Mood>();
 
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
-    
+
+    public DbSet<MediaItem> MediaItems => Set<MediaItem>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
