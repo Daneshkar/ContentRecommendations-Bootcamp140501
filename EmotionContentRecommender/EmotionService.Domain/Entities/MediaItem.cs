@@ -44,15 +44,17 @@ public class MediaItem
         };
 
     public void Update(
-        string name,
-        string description,
         int itemTypeId,
-        string? imageUrl = null)
+        string name,
+        string? description,
+        DateOnly? releaseDate,
+        string? coverUrl)
     {
-        Name = name.Trim();
-        Description = description.Trim();
         ItemTypeId = itemTypeId;
-        ImageUrl = imageUrl?.Trim();
+        Name = name.Trim();
+        Description = description?.Trim();
+        ReleaseDate = releaseDate;
+        ImageUrl = coverUrl?.Trim();
         UpdatedAt = DateTime.UtcNow;
     }
 
