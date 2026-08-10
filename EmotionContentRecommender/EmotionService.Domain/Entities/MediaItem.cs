@@ -10,11 +10,13 @@ public class MediaItem
 
     public int ItemTypeId { get; private set; }
 
-    // public ItemType ItemType { get; private set; }
+    public ItemType ItemType { get; private set; }
 
     public string? ImageUrl { get; private set; }
 
-    public bool IsActive { get; private set; }
+    public bool Status { get; private set; }
+
+    public DateOnly? ReleaseDate { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
 
@@ -26,7 +28,9 @@ public class MediaItem
         string name,
         string description,
         int itemTypeId,
-        string? imageUrl = null)
+        DateOnly? releaseDate,
+        string? imageUrl = null
+        )
         => new()
         {
             Id = Guid.NewGuid(),
@@ -34,7 +38,8 @@ public class MediaItem
             Description = description.Trim(),
             ItemTypeId = itemTypeId,
             ImageUrl = imageUrl?.Trim(),
-            IsActive = true,
+            ReleaseDate = releaseDate,
+            Status = true,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -53,13 +58,13 @@ public class MediaItem
 
     public void Deactivate()
     {
-        IsActive = false;
+        Status = false;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void Activate()
     {
-        IsActive = true;
+        Status = true;
         UpdatedAt = DateTime.UtcNow;
     }
 }

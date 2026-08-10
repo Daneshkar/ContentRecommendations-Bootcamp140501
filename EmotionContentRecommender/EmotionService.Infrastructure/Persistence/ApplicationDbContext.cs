@@ -12,8 +12,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
 
-    public DbSet<MediaItem> MediaItems => Set<MediaItem>();
-
+    public DbSet<ItemType> ItemTypes => Set<ItemType>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(

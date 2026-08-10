@@ -22,13 +22,15 @@ public class MediaItemConfiguration
         builder.Property(x => x.ImageUrl)
             .HasMaxLength(500);
 
-        builder.Property(x => x.IsActive)
+        builder.Property(x => x.Status)
             .IsRequired();
 
-        // builder.HasOne(x => x.ItemType)
-        //     .WithMany()
-        //     .HasForeignKey(x => x.ItemTypeId)
-        //     .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(x => x.ReleaseDate);
+
+        builder.HasOne(x => x.ItemType)
+            .WithMany()
+            .HasForeignKey(x => x.ItemTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(x => x.CreatedAt)
             .IsRequired();
