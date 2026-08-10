@@ -430,4 +430,8 @@ FodyWeavers.xsd
 *.zip
 
 # AppSetting
+<<<<<<< HEAD
 **/appsettings.json
+=======
+**/appsettings.json
+>>>>>>> 9ab311f (feat: add media item domain model and configuration)
