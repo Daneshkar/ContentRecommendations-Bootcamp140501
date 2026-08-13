@@ -428,3 +428,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 *.zip
+
+# AppSetting
+**/appsettings.json

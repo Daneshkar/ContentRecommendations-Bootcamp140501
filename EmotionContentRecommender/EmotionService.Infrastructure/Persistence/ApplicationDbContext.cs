@@ -9,8 +9,10 @@ public class ApplicationDbContext : DbContext
         : base(options) { }
 
     public DbSet<Mood> Moods => Set<Mood>();
- 
 
+    public DbSet<MediaItem> MediaItems => Set<MediaItem>();
+
+    public DbSet<ItemType> ItemTypes => Set<ItemType>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
