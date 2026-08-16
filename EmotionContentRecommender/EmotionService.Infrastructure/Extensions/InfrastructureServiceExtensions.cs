@@ -37,9 +37,7 @@ public static class InfrastructureServiceExtensions
 
         services.Configure<JwtSettings>(jwtSection);
 
-        var jwtSettings = jwtSection.Get<JwtSettings>()
-            ?? throw new InvalidOperationException(
-                "JWT settings are not configured.");
+        var jwtSettings = jwtSection.Get<JwtSettings>()!;
 
         services
             .AddAuthentication(options =>

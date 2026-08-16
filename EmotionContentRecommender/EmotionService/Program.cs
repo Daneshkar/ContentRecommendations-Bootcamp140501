@@ -22,6 +22,11 @@ builder.Services.AddScoped(
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// TODO: JWT authentication is temporarily disabled due to a configuration issue.
+// !The integration flow is implemented, but the JWT settings/validation must be reviewed
+// !with the AuthService implementation before enabling it again.
+// builder.Services.AddJwtAuthentication(builder.Configuration);
+
 var app = builder.Build();
 
 app.UseExceptionHandling();
@@ -36,8 +41,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
