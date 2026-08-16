@@ -70,7 +70,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResult<Login
         response.Cookies.Append("access_token", accessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = false,
             SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         });
@@ -78,7 +78,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResult<Login
         response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = false,
             SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddDays(7),
             Path = "/api/auth/refresh"
