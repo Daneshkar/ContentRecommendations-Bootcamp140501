@@ -34,12 +34,17 @@ public class Genre
     }
 
     public void Update(
+        int itemTypeId,
         string name,
         string? description)
     {
+        if (itemTypeId <= 0)
+            throw new ArgumentException("Item type is required.");
+
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Genre name is required.");
 
+        ItemTypeId = itemTypeId;
         Name = name.Trim();
         Description = description?.Trim();
     }

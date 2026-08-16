@@ -1,5 +1,7 @@
 using EmotionService.Application.Features.Genres.Create;
 using EmotionService.Application.Features.Genres.GetAll;
+using EmotionService.Application.Features.Genres.Update;
+using EmotionService.Application.Features.Genres.GetById;
 using EmotionService.Contracts.Genres;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +47,39 @@ public class GenreController : ControllerBase
 
         var response = await _sender.Send(
             query,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(
+    int id,
+    CancellationToken cancellationToken)
+    {
+        var query = new GetGenreByIdQuery(id);
+
+        var response = await _sender.Send(
+            query,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(
+    int id,
+    [FromBody] UpdateGenreRequest request,
+    CancellationToken cancellationToken)
+    {
+        var command = new UpdateGenreCommand(
+            id,
+            request.ItemTypeId,
+            request.Name,
+            request.Description);
+
+        var response = await _sender.Send(
+            command,
             cancellationToken);
 
         return Ok(response);
