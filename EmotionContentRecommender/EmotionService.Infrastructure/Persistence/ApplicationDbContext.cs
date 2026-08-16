@@ -13,6 +13,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
 
     public DbSet<ItemType> ItemTypes => Set<ItemType>();
+
+    public DbSet<Genre> Genres => Set<Genre>();
+
+    public DbSet<MediaItemGenre> MediaItemGenres => Set<MediaItemGenre>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
