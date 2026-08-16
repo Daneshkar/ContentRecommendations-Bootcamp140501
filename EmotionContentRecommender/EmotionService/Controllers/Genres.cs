@@ -1,4 +1,5 @@
 using EmotionService.Application.Features.Genres.Create;
+using EmotionService.Application.Features.Genres.GetAll;
 using EmotionService.Contracts.Genres;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -33,5 +34,19 @@ public class GenreController : ControllerBase
         return StatusCode(
             StatusCodes.Status201Created,
             response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+    [FromQuery] int? itemTypeId,
+    CancellationToken cancellationToken)
+    {
+        var query = new GetGenresQuery(itemTypeId);
+
+        var response = await _sender.Send(
+            query,
+            cancellationToken);
+
+        return Ok(response);
     }
 }
