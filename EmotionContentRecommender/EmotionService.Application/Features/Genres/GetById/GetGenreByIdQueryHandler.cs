@@ -1,3 +1,4 @@
+using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ public sealed class GetGenreByIdQueryHandler
             .FirstOrDefaultAsync(cancellationToken);
 
         if (genre is null)
-            throw new KeyNotFoundException("Genre not found.");
+            throw new NotFoundException("ژانر مورد نظر یافت نشد");
 
         return genre;
     }

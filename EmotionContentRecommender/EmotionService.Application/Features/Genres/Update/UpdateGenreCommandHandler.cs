@@ -1,3 +1,4 @@
+using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ public sealed class UpdateGenreCommandHandler
                 cancellationToken);
 
         if (genre is null)
-            throw new KeyNotFoundException("Genre not found.");
+            throw new NotFoundException("ژانر مورد نظر یافت نشد");
 
         var itemTypeExists = await _dbContext.ItemTypes
             .AnyAsync(
@@ -32,7 +33,7 @@ public sealed class UpdateGenreCommandHandler
                 cancellationToken);
 
         if (!itemTypeExists)
-            throw new ArgumentException("Item type does not exist.");
+            throw new NotFoundException("مدیا تایپ مورد نظر موجود نیست");
 
         var duplicateExists = await _dbContext.Genres
             .AnyAsync(
@@ -42,8 +43,8 @@ public sealed class UpdateGenreCommandHandler
                 cancellationToken);
 
         if (duplicateExists)
-            throw new ArgumentException(
-                "Genre already exists for this item type.");
+            throw new ConflictException(
+                "این ژانر برای مدیا تایپ مورد نظر وجود دارد");
 
         genre.Update(
             request.ItemTypeId,
