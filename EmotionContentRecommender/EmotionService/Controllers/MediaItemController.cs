@@ -4,6 +4,7 @@ using EmotionService.Application.Features.MediaItems.Deactivate;
 using EmotionService.Application.Features.MediaItems.Update;
 using EmotionService.Application.Features.MediaItems.GetAll;
 using EmotionService.Application.Features.MediaItemGenres.Assign;
+using EmotionService.Application.Features.MediaItemGenres.Remove;
 using EmotionService.Contracts.MediaItems;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -118,6 +119,21 @@ public class MediaItemController : ControllerBase
     {
         await _sender.Send(
             new AssignGenreToMediaItemCommand(
+                mediaItemId,
+                genreId),
+            cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{mediaItemId:guid}/genres/{genreId:int}")]
+    public async Task<IActionResult> RemoveGenre(
+    Guid mediaItemId,
+    int genreId,
+    CancellationToken cancellationToken)
+    {
+        await _sender.Send(
+            new RemoveGenreFromMediaItemCommand(
                 mediaItemId,
                 genreId),
             cancellationToken);
