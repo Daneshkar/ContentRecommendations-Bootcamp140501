@@ -5,6 +5,7 @@ using EmotionService.Application.Features.MediaItems.Update;
 using EmotionService.Application.Features.MediaItems.GetAll;
 using EmotionService.Application.Features.MediaItemGenres.Assign;
 using EmotionService.Application.Features.MediaItemGenres.Remove;
+using EmotionService.Application.Features.MediaItemGenres.GetByMediaItem;
 using EmotionService.Contracts.MediaItems;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -139,5 +140,17 @@ public class MediaItemController : ControllerBase
             cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpGet("{mediaItemId:guid}/genres")]
+    public async Task<IActionResult> GetGenres(
+    Guid mediaItemId,
+    CancellationToken cancellationToken)
+    {
+        var response = await _sender.Send(
+            new GetMediaItemGenresQuery(mediaItemId),
+            cancellationToken);
+
+        return Ok(response);
     }
 }
