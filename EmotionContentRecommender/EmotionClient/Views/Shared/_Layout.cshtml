@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Emotion</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a class="logo" asp-controller="Home" asp-action="Index">Emotion</a>
+            <nav class="nav">
+                @{
+                    var isLoggedIn = Context.Request.Cookies.ContainsKey("access_token");
+                }
+                @if (isLoggedIn)
+                {
+                    <a asp-controller="Home" asp-action="Index">داشبورد</a>
+                    <a asp-controller="Account" asp-action="Profile">پروفایل</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="inline-form">
+                        <button type="submit" class="btn-link">خروج</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">ورود</a>
+                    <a asp-controller="Account" asp-action="Register">ثبت‌نام</a>
+                }
+            </nav>
+        </div>
+    </header>
+
+    <main class="main container">
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 1405 - Emotion</p>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

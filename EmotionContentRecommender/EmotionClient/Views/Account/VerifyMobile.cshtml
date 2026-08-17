@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "فعال‌سازی موبایل";
+    var mobile = ViewBag.Mobile as string ?? "";
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>فعال‌سازی شماره موبایل</h2>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-success">@ViewBag.Message</div>
+        }
+
+        <p style="text-align:center;color:#6b7280;margin-bottom:16px;">
+            شماره موبایل: <strong dir="ltr">@mobile</strong>
+        </p>
+
+        <div id="otp-message"></div>
+
+        <button id="send-otp-btn" class="btn" onclick="sendOtp('@mobile')">
+            ارسال کد تأیید
+        </button>
+        <div id="otp-spinner" class="spinner"></div>
+
+        <div id="otp-section" class="otp-section" style="display:none;margin-top:20px;">
+            <h4>کد تأیید ۶ رقمی</h4>
+            <p>کد ارسال‌شده به شماره موبایل خود را وارد کنید</p>
+
+            <div class="otp-input-row">
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+            </div>
+            <input type="hidden" id="otp-code-hidden" />
+
+            <div class="otp-timer" id="otp-timer"></div>
+
+            <button id="verify-otp-btn" class="btn btn-sm" style="margin-top:16px;" onclick="verifyOtp('@mobile')">
+                تأیید کد
+            </button>
+            <div id="verify-spinner" class="spinner"></div>
+            <div id="otp-verify-message"></div>
+
+            <div class="otp-resend" style="margin-top:12px;">
+                <a id="resend-link" class="disabled" onclick="otpSent=false;sendOtp('@mobile')">ارسال مجدد کد</a>
+            </div>
+        </div>
+
+        <div class="auth-links">
+            <a asp-action="Login">بازگشت به صفحه ورود</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}

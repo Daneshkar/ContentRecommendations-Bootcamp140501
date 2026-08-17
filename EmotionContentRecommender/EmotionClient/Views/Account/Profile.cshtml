@@ -1,0 +1,120 @@
+@model EmotionClient.Services.AuthApiService.ProfileData
+@{
+    ViewData["Title"] = "پروفایل";
+}
+
+<div class="profile-page">
+    <div class="profile-card">
+        <h2>پروفایل کاربری</h2>
+
+        <div class="profile-grid">
+            <div class="profile-item">
+                <span class="profile-label">نام کاربری</span>
+                <span class="profile-value">@Model.Username</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">نام</span>
+                <span class="profile-value">@(Model.FirstName ?? "—")</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">نام خانوادگی</span>
+                <span class="profile-value">@(Model.LastName ?? "—")</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">ایمیل</span>
+                <span class="profile-value">
+                    @(Model.Email ?? "—")
+                    @if (!string.IsNullOrEmpty(Model.Email))
+                    {
+                        <span class="badge @(Model.VerifyEmail ? "badge-success" : "badge-warning")">
+                            @(Model.VerifyEmail ? "تأیید شده" : "تأیید نشده")
+                        </span>
+                    }
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">شماره موبایل</span>
+                <span class="profile-value" dir="ltr">
+                    @(Model.Mobile ?? "—")
+                    @if (!string.IsNullOrEmpty(Model.Mobile))
+                    {
+                        <span class="badge @(Model.VerifyMobile ? "badge-success" : "badge-warning")">
+                            @(Model.VerifyMobile ? "تأیید شده" : "تأیید نشده")
+                        </span>
+                    }
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">تاریخ تولد</span>
+                <span class="profile-value">@(Model.BirthDay?.ToString("yyyy/MM/dd") ?? "—")</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">جنسیت</span>
+                <span class="profile-value">@Model.GenderText</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">نقش</span>
+                <span class="profile-value">
+                    <span class="badge badge-info">
+                        @(Model.Role == "Admin" ? "مدیر" : "کاربر")
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Mobile) && !Model.VerifyMobile)
+    {
+        <div class="profile-card activation-card" id="activation-section">
+            <h3>فعال‌سازی شماره موبایل</h3>
+            <p class="activation-desc">
+                شماره موبایل شما هنوز تأیید نشده است. برای فعال‌سازی، کد تأیید را دریافت کنید.
+            </p>
+
+            <div id="otp-message"></div>
+
+            <button id="send-otp-btn" class="btn" onclick="sendOtp('@Model.Mobile')">
+                ارسال کد تأیید
+            </button>
+            <div id="otp-spinner" class="spinner"></div>
+
+            <div id="otp-section" class="otp-section" style="display:none;margin-top:20px;">
+                <h4>کد تأیید ۶ رقمی</h4>
+                <p>کد ارسال‌شده به شماره @Model.Mobile را وارد کنید</p>
+
+                <div class="otp-input-row">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                </div>
+                <input type="hidden" id="otp-code-hidden" />
+
+                <div class="otp-timer" id="otp-timer"></div>
+
+                <button id="verify-otp-btn" class="btn btn-sm" style="margin-top:16px;" onclick="verifyOtp('@Model.Mobile')">
+                    تأیید کد
+                </button>
+                <div id="verify-spinner" class="spinner"></div>
+                <div id="otp-verify-message"></div>
+
+                <div class="otp-resend" style="margin-top:12px;">
+                    <a id="resend-link" class="disabled" onclick="otpSent=false;sendOtp('@Model.Mobile')">ارسال مجدد کد</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}
