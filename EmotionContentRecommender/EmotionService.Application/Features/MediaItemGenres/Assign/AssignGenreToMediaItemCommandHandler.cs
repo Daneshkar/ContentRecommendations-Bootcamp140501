@@ -39,7 +39,7 @@ public sealed class AssignGenreToMediaItemCommandHandler
 
         if (mediaItem.ItemTypeId != genre.ItemTypeId)
         {
-            throw new ArgumentException(
+            throw new BadRequestException(
                 "ژانر مورد نظر متعلق به این نوع از تایپ این مدیا آیتم نیست");
         }
 
