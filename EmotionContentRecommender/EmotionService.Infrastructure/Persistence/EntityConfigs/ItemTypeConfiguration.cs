@@ -21,32 +21,5 @@ public sealed class ItemTypeConfiguration
 
         builder.HasIndex(x => x.Name)
             .IsUnique();
-
-        builder.HasData(
-           new
-           {
-               Id = 1,
-               Name = "Movie",
-               IsActive = true
-           },
-           new
-           {
-               Id = 2,
-               Name = "Game",
-               IsActive = true
-           },
-           new
-           {
-               Id = 3,
-               Name = "Book",
-               IsActive = true
-           },
-           new
-           {
-               Id = 4,
-               Name = "Music",
-               IsActive = true
-           }
-       );
     }
 }
