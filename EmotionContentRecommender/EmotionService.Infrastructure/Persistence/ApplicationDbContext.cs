@@ -20,6 +20,9 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Theme> Themes => Set<Theme>();
 
+    public DbSet<ItemMoodWeight> ItemMoodWeights
+    => Set<ItemMoodWeight>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
