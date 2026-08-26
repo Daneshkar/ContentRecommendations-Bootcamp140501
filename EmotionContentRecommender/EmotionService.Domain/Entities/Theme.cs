@@ -1,26 +1,31 @@
 namespace EmotionService.Domain.Entities;
 
-public class Mood
+public sealed class Theme
 {
-    public long Id { get; set; }
-    public string Name { get; private set; } = default!;
+    public int Id { get; private set; }
+
+    public string Name { get; private set; } = null!;
+
     public string? Description { get; private set; }
-    public bool IsActive { get; private set; } = true;
 
-    private Mood() { }
+    public bool IsActive { get; private set; }
 
-    private Mood(string name, string? description)
+    private Theme()
+    {
+    }
+
+    private Theme(string name, string? description)
     {
         Name = name.Trim();
         Description = NormalizeDescription(description);
         IsActive = true;
     }
 
-    public static Mood Create(
-    string name,
-    string? description = null)
+    public static Theme Create(
+        string name,
+        string? description = null)
     {
-        return new Mood(name, description);
+        return new Theme(name, description);
     }
 
     public void Update(
