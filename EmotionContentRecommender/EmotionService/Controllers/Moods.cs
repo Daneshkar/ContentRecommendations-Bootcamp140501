@@ -1,5 +1,6 @@
 using EmotionService.Application.Features.Moods.Create;
 using EmotionService.Application.Features.Moods.GetById;
+using EmotionService.Application.Features.Moods.GetAll;
 using EmotionService.Contracts.Moods;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,20 @@ public sealed class MoodController : ControllerBase
     CancellationToken cancellationToken)
     {
         var query = new GetMoodByIdQuery(id);
+
+        var response = await _sender.Send(
+            query,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+    [FromQuery] bool? isActive,
+    CancellationToken cancellationToken)
+    {
+        var query = new GetMoodsQuery(isActive);
 
         var response = await _sender.Send(
             query,
