@@ -30,7 +30,7 @@ public sealed class CreateMoodCommandHandler
         if (duplicateExists)
         {
             throw new ConflictException(
-                "احساساتی با این نام از قبل وجود دارد");
+                "احساسی با این نام از قبل وجود دارد");
         }
 
         var mood = Mood.Create(
