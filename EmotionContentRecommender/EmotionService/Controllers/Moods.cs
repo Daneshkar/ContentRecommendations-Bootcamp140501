@@ -2,6 +2,7 @@ using EmotionService.Application.Features.Moods.Create;
 using EmotionService.Application.Features.Moods.GetById;
 using EmotionService.Application.Features.Moods.GetAll;
 using EmotionService.Application.Features.Moods.Update;
+using EmotionService.Application.Features.Moods.ChangeStatus;
 using EmotionService.Contracts.Moods;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,38 @@ public sealed class MoodController : ControllerBase
             id,
             request.Name,
             request.Description);
+
+        var response = await _sender.Send(
+            command,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:int}/activate")]
+    public async Task<IActionResult> Activate(
+    int id,
+    CancellationToken cancellationToken)
+    {
+        var command = new ChangeMoodStatusCommand(
+            id,
+            true);
+
+        var response = await _sender.Send(
+            command,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:int}/deactivate")]
+    public async Task<IActionResult> Deactivate(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ChangeMoodStatusCommand(
+            id,
+            false);
 
         var response = await _sender.Send(
             command,
