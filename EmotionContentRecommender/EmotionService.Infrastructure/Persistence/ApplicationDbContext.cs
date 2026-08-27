@@ -18,6 +18,14 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<MediaItemGenre> MediaItemGenres => Set<MediaItemGenre>();
 
+    public DbSet<Theme> Themes => Set<Theme>();
+
+    public DbSet<ItemMoodWeight> ItemMoodWeights
+    => Set<ItemMoodWeight>();
+
+    public DbSet<ItemThemeWeight> ItemThemeWeights
+    => Set<ItemThemeWeight>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(

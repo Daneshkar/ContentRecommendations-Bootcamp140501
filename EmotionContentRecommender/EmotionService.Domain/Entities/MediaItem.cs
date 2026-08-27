@@ -10,7 +10,7 @@ public class MediaItem
 
     public int ItemTypeId { get; private set; }
 
-    public ItemType ItemType { get; private set; }
+    public ItemType ItemType { get; private set; } = default!;
 
     public string? ImageUrl { get; private set; }
 
@@ -46,13 +46,13 @@ public class MediaItem
     public void Update(
         int itemTypeId,
         string name,
-        string? description,
+        string description,
         DateOnly? releaseDate,
         string? coverUrl)
     {
         ItemTypeId = itemTypeId;
         Name = name.Trim();
-        Description = description?.Trim();
+        Description = description.Trim();
         ReleaseDate = releaseDate;
         ImageUrl = coverUrl?.Trim();
         UpdatedAt = DateTime.UtcNow;
