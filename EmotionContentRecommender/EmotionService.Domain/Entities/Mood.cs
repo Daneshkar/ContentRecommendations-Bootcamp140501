@@ -2,7 +2,7 @@ namespace EmotionService.Domain.Entities;
 
 public class Mood
 {
-    public long Id { get; set; }
+    public int Id { get; set; }
     public string Name { get; private set; } = default!;
     public string? Description { get; private set; }
     public bool IsActive { get; private set; } = true;

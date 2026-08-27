@@ -14,8 +14,7 @@ public sealed class ItemThemeWeightConfiguration
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Id)
-            .ValueGeneratedNever();
+        builder.Property(x => x.Id);
 
         builder.Property(x => x.WeightValue)
             .HasPrecision(5, 2)

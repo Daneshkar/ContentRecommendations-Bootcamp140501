@@ -10,7 +10,8 @@ public class MoodConfig : IEntityTypeConfiguration<Mood>
        {
               builder.ToTable("Moods");
 
-              builder.HasKey(x => x.Id);
+              builder.Property(x => x.Id)
+                     .UseIdentityColumn();
 
               builder.Property(x => x.Name)
                      .HasMaxLength(50)
