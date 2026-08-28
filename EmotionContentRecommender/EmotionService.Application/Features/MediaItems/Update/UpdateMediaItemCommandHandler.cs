@@ -1,4 +1,5 @@
 using EmotionService.Infrastructure.Persistence;
+using EmotionService.Infrastructure.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +26,18 @@ public sealed class UpdateMediaItemCommandHandler
                 cancellationToken);
 
         if (mediaItem is null)
-            throw new KeyNotFoundException("Media item not found.");
+            throw new NotFoundException("مدیا آیتم مورد نظر یافت نشد");
+
+        if (mediaItem.ItemTypeId != request.ItemTypeId)
+        {
+            var hasDetails = await _dbContext.MovieDetails.AnyAsync(x => x.MediaItemId == request.Id, cancellationToken)
+                || await _dbContext.MusicDetails.AnyAsync(x => x.MediaItemId == request.Id, cancellationToken)
+                || await _dbContext.GameDetails.AnyAsync(x => x.MediaItemId == request.Id, cancellationToken)
+                || await _dbContext.BookDetails.AnyAsync(x => x.MediaItemId == request.Id, cancellationToken);
+
+            if (hasDetails)
+                throw new ConflictException("نوع مدیا آیتم دارای جزئیات است و قابل تغییر نیست");
+        }
 
         var itemTypeExists = await _dbContext.ItemTypes
             .AnyAsync(

@@ -18,6 +18,14 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<MediaItemGenre> MediaItemGenres => Set<MediaItemGenre>();
 
+    public DbSet<MusicDetail> MusicDetails => Set<MusicDetail>();
+
+    public DbSet<MovieDetail> MovieDetails => Set<MovieDetail>();
+
+    public DbSet<GameDetail> GameDetails => Set<GameDetail>();
+
+    public DbSet<BookDetail> BookDetails => Set<BookDetail>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
