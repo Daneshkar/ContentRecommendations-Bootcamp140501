@@ -2,6 +2,7 @@ using EmotionService.Application.Features.Themes.Create;
 using EmotionService.Application.Features.Themes.GetById;
 using EmotionService.Application.Features.Themes.GetAll;
 using EmotionService.Application.Features.Themes.Update;
+using EmotionService.Application.Features.Themes.ChangeStatus;
 using EmotionService.Contracts.Themes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,38 @@ public sealed class ThemeController : ControllerBase
             id,
             request.Name,
             request.Description);
+
+        var response = await _sender.Send(
+            command,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:int}/activate")]
+    public async Task<IActionResult> Activate(
+    int id,
+    CancellationToken cancellationToken)
+    {
+        var command = new ChangeThemeStatusCommand(
+            id,
+            true);
+
+        var response = await _sender.Send(
+            command,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:int}/deactivate")]
+    public async Task<IActionResult> Deactivate(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ChangeThemeStatusCommand(
+            id,
+            false);
 
         var response = await _sender.Send(
             command,
