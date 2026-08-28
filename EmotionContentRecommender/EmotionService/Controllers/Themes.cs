@@ -1,4 +1,5 @@
 using EmotionService.Application.Features.Themes.Create;
+using EmotionService.Application.Features.Themes.GetById;
 using EmotionService.Contracts.Themes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -32,5 +33,19 @@ public sealed class ThemeController : ControllerBase
         return StatusCode(
             StatusCodes.Status201Created,
             response);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(
+    int id,
+    CancellationToken cancellationToken)
+    {
+        var query = new GetThemeByIdQuery(id);
+
+        var response = await _sender.Send(
+            query,
+            cancellationToken);
+
+        return Ok(response);
     }
 }
