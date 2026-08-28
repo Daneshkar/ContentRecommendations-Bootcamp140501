@@ -1,6 +1,7 @@
 using EmotionService.Application.Features.Themes.Create;
 using EmotionService.Application.Features.Themes.GetById;
 using EmotionService.Application.Features.Themes.GetAll;
+using EmotionService.Application.Features.Themes.Update;
 using EmotionService.Contracts.Themes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +60,24 @@ public sealed class ThemeController : ControllerBase
 
         var response = await _sender.Send(
             query,
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(
+    int id,
+    [FromBody] UpdateThemeRequest request,
+    CancellationToken cancellationToken)
+    {
+        var command = new UpdateThemeCommand(
+            id,
+            request.Name,
+            request.Description);
+
+        var response = await _sender.Send(
+            command,
             cancellationToken);
 
         return Ok(response);
