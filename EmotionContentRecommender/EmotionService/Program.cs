@@ -2,6 +2,7 @@
 using EmotionService.Infrastructure.Extensions;
 using EmotionService.Infrastructure.Persistence.Extensions;
 using EmotionService.Infrastructure.Pipeline;
+using FluentValidation;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,9 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(
         typeof(CreateMediaItemCommand).Assembly);
 });
+
+builder.Services.AddValidatorsFromAssembly(
+    typeof(CreateMediaItemCommand).Assembly);
 
 builder.Services.AddScoped(
     typeof(IPipelineBehavior<,>),

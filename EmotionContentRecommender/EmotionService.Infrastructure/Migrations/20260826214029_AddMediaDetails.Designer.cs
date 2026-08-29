@@ -4,6 +4,7 @@ using EmotionService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmotionService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260826214029_AddMediaDetails")]
+    partial class AddMediaDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,70 +151,6 @@ namespace EmotionService.Infrastructure.Migrations
                     b.ToTable("Genres", (string)null);
                 });
 
-            modelBuilder.Entity("EmotionService.Domain.Entities.ItemMoodWeight", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ExperienceCount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("MediaItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("MoodId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("WeightValue")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MoodId");
-
-                    b.HasIndex("MediaItemId", "MoodId")
-                        .IsUnique();
-
-                    b.ToTable("ItemMoodWeights", (string)null);
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.ItemThemeWeight", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ExperienceCount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("MediaItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ThemeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("WeightValue")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ThemeId");
-
-                    b.HasIndex("MediaItemId", "ThemeId")
-                        .IsUnique();
-
-                    b.ToTable("ItemThemeWeights", (string)null);
-                });
-
             modelBuilder.Entity("EmotionService.Domain.Entities.ItemType", b =>
                 {
                     b.Property<int>("Id")
@@ -296,14 +235,14 @@ namespace EmotionService.Infrastructure.Migrations
 
             modelBuilder.Entity("EmotionService.Domain.Entities.Mood", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -439,33 +378,6 @@ namespace EmotionService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MediaItem");
-            modelBuilder.Entity("EmotionService.Domain.Entities.Theme", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Themes", (string)null);
                 });
 
             modelBuilder.Entity("EmotionService.Domain.Entities.Genre", b =>
@@ -475,44 +387,6 @@ namespace EmotionService.Infrastructure.Migrations
                         .HasForeignKey("ItemTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.ItemMoodWeight", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithMany()
-                        .HasForeignKey("MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EmotionService.Domain.Entities.Mood", "Mood")
-                        .WithMany()
-                        .HasForeignKey("MoodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-
-                    b.Navigation("Mood");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.ItemThemeWeight", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithMany()
-                        .HasForeignKey("MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EmotionService.Domain.Entities.Theme", "Theme")
-                        .WithMany()
-                        .HasForeignKey("ThemeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-
-                    b.Navigation("Theme");
                 });
 
             modelBuilder.Entity("EmotionService.Domain.Entities.MediaItem", b =>
