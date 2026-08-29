@@ -33,6 +33,15 @@ public class ApplicationDbContext : DbContext
     public DbSet<ItemThemeWeight> ItemThemeWeights
     => Set<ItemThemeWeight>();
 
+    public DbSet<Experience> Experiences
+    => Set<Experience>();
+
+    public DbSet<ExperienceMood> ExperienceMoods
+        => Set<ExperienceMood>();
+
+    public DbSet<ExperienceTheme> ExperienceThemes
+        => Set<ExperienceTheme>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
