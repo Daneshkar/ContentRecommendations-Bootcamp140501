@@ -16,6 +16,16 @@ public sealed class Experience
 
     public DateTime? UpdatedAt { get; private set; }
 
+    private readonly List<ExperienceMood> _experienceMoods = [];
+
+    private readonly List<ExperienceTheme> _experienceThemes = [];
+
+    public IReadOnlyCollection<ExperienceMood> ExperienceMoods
+        => _experienceMoods;
+
+    public IReadOnlyCollection<ExperienceTheme> ExperienceThemes
+        => _experienceThemes;
+
     private Experience()
     {
     }
