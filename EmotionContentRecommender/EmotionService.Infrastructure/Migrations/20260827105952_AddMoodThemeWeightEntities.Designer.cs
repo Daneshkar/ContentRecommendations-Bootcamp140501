@@ -4,6 +4,7 @@ using EmotionService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmotionService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260827105952_AddMoodThemeWeightEntities")]
+    partial class AddMoodThemeWeightEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,106 +24,6 @@ namespace EmotionService.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.BookDetail", b =>
-                {
-                    b.Property<Guid>("MediaItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Author")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
-
-                    b.Property<string>("Edition")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ISBN")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("PageCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly?>("PublicationDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Publisher")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("MediaItemId");
-
-                    b.ToTable("BookDetails", (string)null);
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.GameDetail", b =>
-                {
-                    b.Property<Guid>("MediaItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AgeRating")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
-
-                    b.Property<string>("Developer")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Engine")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("GameMode")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Platform")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Publisher")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int?>("ReleaseYear")
-                        .HasColumnType("int");
-
-                    b.HasKey("MediaItemId");
-
-                    b.ToTable("GameDetails", (string)null);
-                });
 
             modelBuilder.Entity("EmotionService.Domain.Entities.Genre", b =>
                 {
@@ -323,122 +226,6 @@ namespace EmotionService.Infrastructure.Migrations
                     b.ToTable("Moods", (string)null);
                 });
 
-            modelBuilder.Entity("EmotionService.Domain.Entities.MovieDetail", b =>
-                {
-                    b.Property<Guid>("MediaItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AgeRating")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Cast")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Country")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Director")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("DurationMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Language")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("ReleaseYear")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Studio")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Synopsis")
-                        .IsRequired()
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
-
-                    b.HasKey("MediaItemId");
-
-                    b.ToTable("MovieDetails", (string)null);
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MusicDetail", b =>
-                {
-                    b.Property<Guid>("MediaItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Album")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Artist")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<int>("DurationSeconds")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Language")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Publisher")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int?>("ReleaseYear")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TrackNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("MediaItemId");
-
-                    b.ToTable("MusicDetails", (string)null);
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.BookDetail", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithOne()
-                        .HasForeignKey("EmotionService.Domain.Entities.BookDetail", "MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.GameDetail", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithOne()
-                        .HasForeignKey("EmotionService.Domain.Entities.GameDetail", "MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
             modelBuilder.Entity("EmotionService.Domain.Entities.Theme", b =>
                 {
                     b.Property<int>("Id")
@@ -541,28 +328,6 @@ namespace EmotionService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Genre");
-
-                    b.Navigation("MediaItem");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MovieDetail", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithOne()
-                        .HasForeignKey("EmotionService.Domain.Entities.MovieDetail", "MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MusicDetail", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithOne()
-                        .HasForeignKey("EmotionService.Domain.Entities.MusicDetail", "MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("MediaItem");
                 });

@@ -25,6 +25,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<GameDetail> GameDetails => Set<GameDetail>();
 
     public DbSet<BookDetail> BookDetails => Set<BookDetail>();
+    public DbSet<Theme> Themes => Set<Theme>();
+
+    public DbSet<ItemMoodWeight> ItemMoodWeights
+    => Set<ItemMoodWeight>();
+
+    public DbSet<ItemThemeWeight> ItemThemeWeights
+    => Set<ItemThemeWeight>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
