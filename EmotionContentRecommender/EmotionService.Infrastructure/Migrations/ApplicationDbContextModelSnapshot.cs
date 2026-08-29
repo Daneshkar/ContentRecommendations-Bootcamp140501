@@ -439,134 +439,135 @@ namespace EmotionService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MediaItem");
-            modelBuilder.Entity("EmotionService.Domain.Entities.Theme", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    modelBuilder.Entity("EmotionService.Domain.Entities.Theme", b =>
+                        {
+                            b.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                            b.Property<string>("Description")
+                                .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                            b.Property<bool>("IsActive")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bit")
+                                .HasDefaultValue(true);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                            b.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id");
+                            b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                            b.HasIndex("Name")
+                                .IsUnique();
 
-                    b.ToTable("Themes", (string)null);
+                            b.ToTable("Themes", (string)null);
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.Genre", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.ItemType", null)
+                                .WithMany()
+                                .HasForeignKey("ItemTypeId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.ItemMoodWeight", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
+                                .WithMany()
+                                .HasForeignKey("MediaItemId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b.HasOne("EmotionService.Domain.Entities.Mood", "Mood")
+                                .WithMany()
+                                .HasForeignKey("MoodId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b.Navigation("MediaItem");
+
+                            b.Navigation("Mood");
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.ItemThemeWeight", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
+                                .WithMany()
+                                .HasForeignKey("MediaItemId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b.HasOne("EmotionService.Domain.Entities.Theme", "Theme")
+                                .WithMany()
+                                .HasForeignKey("ThemeId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b.Navigation("MediaItem");
+
+                            b.Navigation("Theme");
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.MediaItem", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.ItemType", "ItemType")
+                                .WithMany()
+                                .HasForeignKey("ItemTypeId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b.Navigation("ItemType");
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.MediaItemGenre", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.Genre", "Genre")
+                                .WithMany()
+                                .HasForeignKey("GenreId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
+                                .WithMany()
+                                .HasForeignKey("MediaItemId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b.Navigation("Genre");
+
+                            b.Navigation("MediaItem");
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.MovieDetail", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
+                                .WithOne()
+                                .HasForeignKey("EmotionService.Domain.Entities.MovieDetail", "MediaItemId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b.Navigation("MediaItem");
+                        });
+
+                    modelBuilder.Entity("EmotionService.Domain.Entities.MusicDetail", b =>
+                        {
+                            b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
+                                .WithOne()
+                                .HasForeignKey("EmotionService.Domain.Entities.MusicDetail", "MediaItemId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b.Navigation("MediaItem");
+                        });
+
                 });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.Genre", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.ItemType", null)
-                        .WithMany()
-                        .HasForeignKey("ItemTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.ItemMoodWeight", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithMany()
-                        .HasForeignKey("MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EmotionService.Domain.Entities.Mood", "Mood")
-                        .WithMany()
-                        .HasForeignKey("MoodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-
-                    b.Navigation("Mood");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.ItemThemeWeight", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithMany()
-                        .HasForeignKey("MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EmotionService.Domain.Entities.Theme", "Theme")
-                        .WithMany()
-                        .HasForeignKey("ThemeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-
-                    b.Navigation("Theme");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MediaItem", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.ItemType", "ItemType")
-                        .WithMany()
-                        .HasForeignKey("ItemTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ItemType");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MediaItemGenre", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.Genre", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithMany()
-                        .HasForeignKey("MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Genre");
-
-                    b.Navigation("MediaItem");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MovieDetail", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithOne()
-                        .HasForeignKey("EmotionService.Domain.Entities.MovieDetail", "MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-                });
-
-            modelBuilder.Entity("EmotionService.Domain.Entities.MusicDetail", b =>
-                {
-                    b.HasOne("EmotionService.Domain.Entities.MediaItem", "MediaItem")
-                        .WithOne()
-                        .HasForeignKey("EmotionService.Domain.Entities.MusicDetail", "MediaItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MediaItem");
-                });
-#pragma warning restore 612, 618
         }
     }
 }
