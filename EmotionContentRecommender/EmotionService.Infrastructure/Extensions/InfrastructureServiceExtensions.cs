@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
@@ -77,6 +78,20 @@ public static class InfrastructureServiceExtensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        var logger = ctx.HttpContext.RequestServices
+                            .GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("JwtAuthentication");
+
+                        logger.LogError(
+                            ctx.Exception,
+                            "JWT authentication failed. ExceptionType: {ExceptionType}",
+                            ctx.Exception.GetType().Name);
+
+                        return Task.CompletedTask;
+                    },
+
                     OnMessageReceived = ctx =>
                     {
                         if (ctx.Request.Cookies.TryGetValue(
