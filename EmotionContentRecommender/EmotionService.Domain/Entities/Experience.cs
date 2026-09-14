@@ -34,11 +34,13 @@ public sealed class Experience
 
     private Experience(
         long userId,
+        int score,
         Guid mediaItemId,
         string? note)
     {
         Id = Guid.NewGuid();
         UserId = userId;
+        Score = score;
         MediaItemId = mediaItemId;
         Note = NormalizeNote(note);
         CreatedAt = DateTime.UtcNow;
@@ -68,9 +70,9 @@ public sealed class Experience
                 "Media Item needed",
                 nameof(mediaItemId));
         }
-
         return new Experience(
             userId,
+            score,
             mediaItemId,
             note);
     }
