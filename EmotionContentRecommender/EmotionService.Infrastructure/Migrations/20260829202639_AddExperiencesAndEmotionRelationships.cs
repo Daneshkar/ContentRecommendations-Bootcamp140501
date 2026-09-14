@@ -15,6 +15,7 @@ namespace EmotionService.Infrastructure.Migrations
                 name: "Experiences",
                 columns: table => new
                 {
+                    Incompatible
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     MediaItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),

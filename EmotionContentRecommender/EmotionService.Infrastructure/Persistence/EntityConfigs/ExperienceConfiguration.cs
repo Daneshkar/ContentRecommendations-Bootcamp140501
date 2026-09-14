@@ -9,7 +9,15 @@ public sealed class ExperienceConfiguration
 {
     public void Configure(EntityTypeBuilder<Experience> builder)
     {
-        builder.ToTable("Experiences");
+        builder.ToTable("Experiences", table =>
+        {
+            table.HasCheckConstraint(
+                "CK_Experiences_Score",
+                "[Score] BETWEEN 1 AND 5");
+        });
+
+        builder.Property(x => x.Score)
+            .IsRequired();
 
         builder.HasKey(x => x.Id);
 
