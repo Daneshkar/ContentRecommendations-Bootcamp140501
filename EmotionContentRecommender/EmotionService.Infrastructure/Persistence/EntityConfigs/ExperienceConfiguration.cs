@@ -42,7 +42,11 @@ public sealed class ExperienceConfiguration
             .HasColumnType("datetime2")
             .IsRequired(false);
 
-        builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => new
+        {
+            x.UserId,
+            x.MediaItemId
+        }).IsUnique();
 
         builder.HasIndex(x => x.MediaItemId);
 
