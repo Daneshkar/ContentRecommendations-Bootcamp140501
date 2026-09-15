@@ -66,7 +66,6 @@ public sealed class CreateExperienceCommandHandler(
         dbContext.Experiences.Add(experience);
         dbContext.ExperienceMoods.AddRange(experienceMoods);
         dbContext.ExperienceThemes.AddRange(experienceThemes);
-
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new CreateExperienceResponse(
@@ -75,7 +74,6 @@ public sealed class CreateExperienceCommandHandler(
             experience.MediaItemId,
             experience.Score,
             experience.Note,
-            userWeight,
             command.MoodIds,
             command.ThemeIds,
             experience.CreatedAt);
