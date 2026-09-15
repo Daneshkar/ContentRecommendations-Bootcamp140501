@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using EmotionService.Application.Features.Experiences.Create;
 using EmotionService.Application.Features.Experiences.Delete;
 using EmotionService.Application.Features.Experiences.GetById;
 using EmotionService.Application.Features.Experiences.GetMine;
 using EmotionService.Application.Features.Experiences.Update;
 using EmotionService.Contracts.Experiences;
+using EmotionService.Infrastructure.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,16 +14,16 @@ namespace EmotionService.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/experiences")]
-public sealed class ExperiencesController(ISender sender) : ControllerBase
+public sealed class ExperiencesController(
+    ISender sender,
+    ICurrentUserService currentUserService)
+    : ControllerBase
 {
     [HttpGet("me")]
     public async Task<IActionResult> GetMine(
         CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId))
-        {
-            return Unauthorized();
-        }
+        var userId = currentUserService.GetUserId();
 
         var response = await sender.Send(
             new GetMyExperiencesQuery(userId),
@@ -37,10 +37,7 @@ public sealed class ExperiencesController(ISender sender) : ControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId))
-        {
-            return Unauthorized();
-        }
+        var userId = currentUserService.GetUserId();
 
         var response = await sender.Send(
             new GetExperienceByIdQuery(id, userId),
@@ -54,10 +51,7 @@ public sealed class ExperiencesController(ISender sender) : ControllerBase
         [FromBody] CreateExperienceRequest request,
         CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId))
-        {
-            return Unauthorized();
-        }
+        var userId = currentUserService.GetUserId();
 
         var command = new CreateExperienceCommand(
             userId,
@@ -80,10 +74,7 @@ public sealed class ExperiencesController(ISender sender) : ControllerBase
         [FromBody] UpdateExperienceRequest request,
         CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId))
-        {
-            return Unauthorized();
-        }
+        var userId = currentUserService.GetUserId();
 
         var response = await sender.Send(
             new UpdateExperienceCommand(
@@ -103,23 +94,12 @@ public sealed class ExperiencesController(ISender sender) : ControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId))
-        {
-            return Unauthorized();
-        }
+        var userId = currentUserService.GetUserId();
 
         await sender.Send(
             new DeleteExperienceCommand(id, userId),
             cancellationToken);
 
         return NoContent();
-    }
-
-    private bool TryGetUserId(out long userId)
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? User.FindFirstValue("sub");
-
-        return long.TryParse(userIdClaim, out userId) && userId > 0;
     }
 }

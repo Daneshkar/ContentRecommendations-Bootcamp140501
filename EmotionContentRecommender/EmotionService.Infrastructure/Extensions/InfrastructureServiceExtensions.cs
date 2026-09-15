@@ -27,6 +27,9 @@ public static class InfrastructureServiceExtensions
                 sql => sql.MigrationsAssembly(
                     typeof(ApplicationDbContext).Assembly.FullName)));
 
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
         return services;
     }
 

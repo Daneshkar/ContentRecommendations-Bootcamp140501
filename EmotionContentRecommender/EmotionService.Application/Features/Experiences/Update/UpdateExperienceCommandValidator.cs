@@ -30,8 +30,6 @@ public sealed class UpdateExperienceCommandValidator
             .WithMessage("شناسهٔ حالت احساسی باید بزرگ‌تر از صفر باشد.");
 
         RuleFor(x => x.ThemeIds)
-            .NotEmpty()
-            .WithMessage("حداقل یک تم باید انتخاب شود.")
             .Must(HaveUniqueValues)
             .WithMessage("هر تم فقط یک‌بار قابل انتخاب است.");
 
