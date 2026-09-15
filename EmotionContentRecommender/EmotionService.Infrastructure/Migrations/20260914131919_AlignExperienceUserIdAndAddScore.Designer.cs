@@ -4,6 +4,7 @@ using EmotionService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmotionService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914131919_AlignExperienceUserIdAndAddScore")]
+    partial class AlignExperienceUserIdAndAddScore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,8 +104,7 @@ namespace EmotionService.Infrastructure.Migrations
 
                     b.HasIndex("MediaItemId");
 
-                    b.HasIndex("UserId", "MediaItemId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Experiences", null, t =>
                         {
@@ -128,7 +130,7 @@ namespace EmotionService.Infrastructure.Migrations
 
                     b.ToTable("ExperienceMoods", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ExperienceMoods_UserWeight", "[UserWeight] >= 0.00 AND [UserWeight] <= 0.10");
+                            t.HasCheckConstraint("CK_ExperienceMoods_UserWeight", "[UserWeight] >= 1.00 AND [UserWeight] <= 5.00");
                         });
                 });
 
@@ -150,7 +152,7 @@ namespace EmotionService.Infrastructure.Migrations
 
                     b.ToTable("ExperienceThemes", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ExperienceThemes_UserWeight", "[UserWeight] >= 0.00 AND [UserWeight] <= 0.10");
+                            t.HasCheckConstraint("CK_ExperienceThemes_UserWeight", "[UserWeight] >= 1.00 AND [UserWeight] <= 5.00");
                         });
                 });
 
@@ -249,8 +251,8 @@ namespace EmotionService.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("WeightValue")
-                        .HasPrecision(6, 5)
-                        .HasColumnType("decimal(6,5)");
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.HasKey("Id");
 
@@ -281,8 +283,8 @@ namespace EmotionService.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("WeightValue")
-                        .HasPrecision(6, 5)
-                        .HasColumnType("decimal(6,5)");
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.HasKey("Id");
 

@@ -15,7 +15,7 @@ public sealed class ExperienceThemeConfiguration
             {
                 tableBuilder.HasCheckConstraint(
                     "CK_ExperienceThemes_UserWeight",
-                    "[UserWeight] >= 1.00 AND [UserWeight] <= 5.00");
+                    "[UserWeight] >= 0.00 AND [UserWeight] <= 0.10");
             });
 
         builder.HasKey(x => new

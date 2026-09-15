@@ -9,7 +9,15 @@ public sealed class ExperienceConfiguration
 {
     public void Configure(EntityTypeBuilder<Experience> builder)
     {
-        builder.ToTable("Experiences");
+        builder.ToTable("Experiences", table =>
+        {
+            table.HasCheckConstraint(
+                "CK_Experiences_Score",
+                "[Score] BETWEEN 1 AND 5");
+        });
+
+        builder.Property(x => x.Score)
+            .IsRequired();
 
         builder.HasKey(x => x.Id);
 
@@ -34,7 +42,11 @@ public sealed class ExperienceConfiguration
             .HasColumnType("datetime2")
             .IsRequired(false);
 
-        builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => new
+        {
+            x.UserId,
+            x.MediaItemId
+        }).IsUnique();
 
         builder.HasIndex(x => x.MediaItemId);
 

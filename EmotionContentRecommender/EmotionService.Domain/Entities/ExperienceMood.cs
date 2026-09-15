@@ -62,11 +62,11 @@ public sealed class ExperienceMood
 
     private static void ValidateWeight(decimal userWeight)
     {
-        if (userWeight is < 1.00m or > 5.00m)
+        if (userWeight is < 0.00m or > 0.10m)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(userWeight),
-                "User weight must be between 1.00 and 5.00.");
+                "User weight must be between 0.00 and 0.10.");
         }
     }
 }

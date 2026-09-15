@@ -17,7 +17,7 @@ public sealed class ItemThemeWeightConfiguration
         builder.Property(x => x.Id);
 
         builder.Property(x => x.WeightValue)
-            .HasPrecision(5, 2)
+            .HasPrecision(6, 5)
             .IsRequired();
 
         builder.Property(x => x.ExperienceCount)

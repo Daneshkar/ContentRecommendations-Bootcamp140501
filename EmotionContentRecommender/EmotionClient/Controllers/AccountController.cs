@@ -127,8 +127,9 @@ public class AccountController : Controller
             var options = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = Request.IsHttps,
                 SameSite = SameSiteMode.Lax,
+                Path = "/",
                 Expires = name == "access_token"
                     ? DateTimeOffset.UtcNow.AddMinutes(15)
                     : DateTimeOffset.UtcNow.AddDays(7)

@@ -4,7 +4,9 @@ public sealed class Experience
 {
     public Guid Id { get; private set; }
 
-    public int UserId { get; private set; }
+    public long UserId { get; private set; }
+
+    public int Score { get; private set; }
 
     public Guid MediaItemId { get; private set; }
 
@@ -31,19 +33,22 @@ public sealed class Experience
     }
 
     private Experience(
-        int userId,
+        long userId,
+        int score,
         Guid mediaItemId,
         string? note)
     {
         Id = Guid.NewGuid();
         UserId = userId;
+        Score = score;
         MediaItemId = mediaItemId;
         Note = NormalizeNote(note);
         CreatedAt = DateTime.UtcNow;
     }
 
     public static Experience Create(
-        int userId,
+        long userId,
+        int score,
         Guid mediaItemId,
         string? note = null)
     {
@@ -54,15 +59,20 @@ public sealed class Experience
                 nameof(userId));
         }
 
+        if (score is < 1 or > 5)
+            throw new ArgumentOutOfRangeException(
+                nameof(score),
+                "Score must be between 1 and 5.");
+
         if (mediaItemId == Guid.Empty)
         {
             throw new ArgumentException(
-                "مدیا ایتم مورد نیاز است",
+                "Media Item needed",
                 nameof(mediaItemId));
         }
-
         return new Experience(
             userId,
+            score,
             mediaItemId,
             note);
     }
@@ -78,5 +88,16 @@ public sealed class Experience
         return string.IsNullOrWhiteSpace(note)
             ? null
             : note.Trim();
+    }
+
+    public void UpdateScore(int score)
+    {
+        if (score is < 1 or > 5)
+            throw new ArgumentOutOfRangeException(
+                nameof(score),
+                "Score must be between 1 and 5.");
+
+        Score = score;
+        UpdatedAt = DateTime.UtcNow;
     }
 }
