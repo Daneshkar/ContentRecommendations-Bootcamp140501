@@ -24,7 +24,7 @@ public class ValidationPipelineBehavior<TRequest, TResponse>
             .Select(v => v.Validate(context))
             .Where(r => r.Errors.Count != 0)
             .SelectMany(r => r.Errors)
-            .DistinctBy(e => e.ErrorMessage)
+            .DistinctBy(e => (e.PropertyName, e.ErrorMessage))
             .ToList();
 
         if (errors.Count != 0)
