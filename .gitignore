@@ -431,3 +431,6 @@ FodyWeavers.xsd
 
 # AppSetting
 **/appsettings.json
+
+# Local Codex project memory (must stay outside version control)
+/.codex-memory/
