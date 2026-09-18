@@ -28,6 +28,8 @@ public class ItemMoodWeight
         decimal weightValue,
         int experienceCount)
     {
+        ValidateWeight(weightValue, experienceCount);
+
         return new ItemMoodWeight
         {
             Id = Guid.NewGuid(),
@@ -43,8 +45,29 @@ public class ItemMoodWeight
         decimal weightValue,
         int experienceCount)
     {
+        ValidateWeight(weightValue, experienceCount);
+
         WeightValue = weightValue;
         ExperienceCount = experienceCount;
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    private static void ValidateWeight(
+        decimal weightValue,
+        int experienceCount)
+    {
+        if (weightValue is < 0.00m or > 0.10m)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(weightValue),
+                "Weight value must be between 0.00 and 0.10.");
+        }
+
+        if (experienceCount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(experienceCount),
+                "Experience count must be greater than zero.");
+        }
     }
 }

@@ -1,4 +1,5 @@
 using EmotionService.Domain.Entities;
+using EmotionService.Infrastructure.BackgroundJobs;
 using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Persistence;
 using MediatR;
@@ -7,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 namespace EmotionService.Application.Features.Experiences.Update;
 
 public sealed class UpdateExperienceCommandHandler(
-    ApplicationDbContext dbContext)
+    ApplicationDbContext dbContext,
+    AggregateWeightQueue aggregateWeightQueue)
     : IRequestHandler<UpdateExperienceCommand, UpdateExperienceResponse>
 {
     public async Task<UpdateExperienceResponse> Handle(
@@ -32,6 +34,9 @@ public sealed class UpdateExperienceCommandHandler(
         var userWeight = ExperienceUserWeightCalculator.FromScore(
             command.Score);
 
+        await using var transaction = await dbContext.Database
+            .BeginTransactionAsync(cancellationToken);
+
         experience.UpdateScore(command.Score);
         experience.UpdateNote(command.Note);
 
@@ -39,6 +44,12 @@ public sealed class UpdateExperienceCommandHandler(
         SynchronizeThemes(experience, command.ThemeIds, userWeight);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await aggregateWeightQueue.MarkPendingAsync(
+            experience.MediaItemId,
+            cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
 
         return new UpdateExperienceResponse(
             experience.Id,

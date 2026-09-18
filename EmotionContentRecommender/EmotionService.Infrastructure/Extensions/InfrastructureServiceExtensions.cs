@@ -1,4 +1,5 @@
-﻿using EmotionService.Infrastructure.Exceptions;
+﻿using EmotionService.Infrastructure.BackgroundJobs;
+using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Jwt;
 using EmotionService.Infrastructure.Middlewares;
 using EmotionService.Infrastructure.Persistence;
@@ -29,6 +30,30 @@ public static class InfrastructureServiceExtensions
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        services.AddOptions<AggregateWeightJobOptions>()
+            .Bind(configuration.GetSection(
+                AggregateWeightJobOptions.SectionName))
+            .Validate(
+                options => options.Hour is >= 0 and <= 23,
+                "AggregateWeightJob:Hour must be between 0 and 23.")
+            .Validate(
+                options => options.Minute is >= 0 and <= 59,
+                "AggregateWeightJob:Minute must be between 0 and 59.")
+            .Validate(
+                options => !string.IsNullOrWhiteSpace(options.TimeZoneId),
+                "AggregateWeightJob:TimeZoneId is required.")
+            .Validate(
+                options => options.BatchSize is >= 1 and <= 10_000,
+                "AggregateWeightJob:BatchSize must be between 1 and 10000.")
+            .Validate(
+                options => options.MaxBatchesPerRun is >= 1 and <= 1_000,
+                "AggregateWeightJob:MaxBatchesPerRun must be between 1 and 1000.")
+            .ValidateOnStart();
+
+        services.AddScoped<AggregateWeightQueue>();
+        services.AddScoped<AggregateWeightProcessor>();
+        services.AddHostedService<AggregateWeightBackgroundService>();
 
         return services;
     }
