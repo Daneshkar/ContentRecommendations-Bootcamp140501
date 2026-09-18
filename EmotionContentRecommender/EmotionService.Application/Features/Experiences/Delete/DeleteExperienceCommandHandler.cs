@@ -1,3 +1,4 @@
+using EmotionService.Infrastructure.BackgroundJobs;
 using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Persistence;
 using MediatR;
@@ -6,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace EmotionService.Application.Features.Experiences.Delete;
 
 public sealed class DeleteExperienceCommandHandler(
-    ApplicationDbContext dbContext)
+    ApplicationDbContext dbContext,
+    AggregateWeightQueue aggregateWeightQueue)
     : IRequestHandler<DeleteExperienceCommand>
 {
     public async Task Handle(
@@ -23,7 +25,16 @@ public sealed class DeleteExperienceCommandHandler(
             throw new NotFoundException("تجربه‌ی مورد نظر یافت نشد.");
         }
 
+        await using var transaction = await dbContext.Database
+            .BeginTransactionAsync(cancellationToken);
+
         dbContext.Experiences.Remove(experience);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await aggregateWeightQueue.MarkPendingAsync(
+            experience.MediaItemId,
+            cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
     }
 }

@@ -42,6 +42,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<ExperienceTheme> ExperienceThemes
         => Set<ExperienceTheme>();
 
+    public DbSet<PendingMediaItemWeightUpdate>
+        PendingMediaItemWeightUpdates
+        => Set<PendingMediaItemWeightUpdate>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(

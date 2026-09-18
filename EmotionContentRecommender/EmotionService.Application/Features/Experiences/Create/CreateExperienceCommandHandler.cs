@@ -1,4 +1,5 @@
 using EmotionService.Domain.Entities;
+using EmotionService.Infrastructure.BackgroundJobs;
 using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Persistence;
 using MediatR;
@@ -7,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 namespace EmotionService.Application.Features.Experiences.Create;
 
 public sealed class CreateExperienceCommandHandler(
-    ApplicationDbContext dbContext)
+    ApplicationDbContext dbContext,
+    AggregateWeightQueue aggregateWeightQueue)
     : IRequestHandler<CreateExperienceCommand, CreateExperienceResponse>
 {
     public async Task<CreateExperienceResponse> Handle(
@@ -63,10 +65,19 @@ public sealed class CreateExperienceCommandHandler(
                 userWeight))
             .ToArray();
 
+        await using var transaction = await dbContext.Database
+            .BeginTransactionAsync(cancellationToken);
+
         dbContext.Experiences.Add(experience);
         dbContext.ExperienceMoods.AddRange(experienceMoods);
         dbContext.ExperienceThemes.AddRange(experienceThemes);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await aggregateWeightQueue.MarkPendingAsync(
+            experience.MediaItemId,
+            cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
 
         return new CreateExperienceResponse(
             experience.Id,
