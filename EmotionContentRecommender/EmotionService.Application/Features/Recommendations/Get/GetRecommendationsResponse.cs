@@ -29,10 +29,13 @@ public sealed record RecommendationItemResponse(
     RecommendationDetailsResponse? Details);
 
 public sealed record RecommendationContextResponse(
-    RecommendationNamedValueResponse PrimaryMood,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    RecommendationNamedValueResponse? PrimaryMood,
     IReadOnlyList<RecommendationNamedValueResponse> MatchedAdditionalMoods,
     IReadOnlyList<RecommendationNamedValueResponse> MatchedThemes,
-    string Mode);
+    string Mode,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyList<RecommendationNamedValueResponse>? MatchedMoods = null);
 
 public sealed record RecommendationNamedValueResponse(
     int Id,

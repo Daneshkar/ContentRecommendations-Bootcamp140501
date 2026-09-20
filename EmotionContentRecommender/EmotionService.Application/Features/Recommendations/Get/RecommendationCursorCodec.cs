@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using EmotionService.Infrastructure.Exceptions;
 
 namespace EmotionService.Application.Features.Recommendations.Get;
@@ -8,8 +9,10 @@ namespace EmotionService.Application.Features.Recommendations.Get;
 internal sealed record RecommendationCursor(
     string CriteriaFingerprint,
     decimal FinalScore,
-    decimal PrimaryMoodScore,
-    int PrimaryExperienceCount,
+    [property: JsonPropertyName("PrimaryMoodScore")]
+    decimal SecondaryScore,
+    [property: JsonPropertyName("PrimaryExperienceCount")]
+    int AggregateSupport,
     string MediaItemKey);
 
 internal sealed class RecommendationCursorCodec
@@ -92,6 +95,25 @@ internal sealed class RecommendationCursorCodec
             itemTypeId,
             primaryMoodId,
             string.Join(',', additionalMoodIds.Order()),
+            string.Join(',', themeIds.Order()));
+
+        return Convert.ToHexString(
+            SHA256.HashData(Encoding.UTF8.GetBytes(criteria)));
+    }
+
+    public static string CreateExperienceCriteriaFingerprint(
+        long userId,
+        Guid experienceId,
+        int itemTypeId,
+        IReadOnlyCollection<int> moodIds,
+        IReadOnlyCollection<int> themeIds)
+    {
+        var criteria = string.Join(
+            '|',
+            userId,
+            experienceId,
+            itemTypeId,
+            string.Join(',', moodIds.Order()),
             string.Join(',', themeIds.Order()));
 
         return Convert.ToHexString(
