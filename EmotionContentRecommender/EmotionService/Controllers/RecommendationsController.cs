@@ -1,4 +1,5 @@
 using EmotionService.Application.Features.Recommendations.Get;
+using EmotionService.Application.Features.Recommendations.GetByExperience;
 using EmotionService.Contracts.Recommendations;
 using EmotionService.Infrastructure.Extensions;
 using MediatR;
@@ -27,6 +28,22 @@ public sealed class RecommendationsController(
                 request.PrimaryMoodId,
                 request.AdditionalMoodIds ?? [],
                 request.ThemeIds ?? [],
+                request.PageSize ?? 10,
+                request.Cursor),
+            cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPost("by-experience")]
+    public async Task<IActionResult> GetByExperience(
+        [FromBody] GetExperienceRecommendationsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var response = await sender.Send(
+            new GetExperienceRecommendationsQuery(
+                currentUserService.GetUserId(),
+                request.ExperienceId,
                 request.PageSize ?? 10,
                 request.Cursor),
             cancellationToken);
