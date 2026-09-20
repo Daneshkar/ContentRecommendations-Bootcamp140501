@@ -1,42 +1,164 @@
 @model LoginViewModel
 @{
-    ViewData["Title"] = "ورود";
+    Layout = null;
+    ViewData["Title"] = "Sign in";
 }
 
-<div class="auth-page">
-    <div class="auth-card">
-        <h2>ورود به Emotion</h2>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in — WatchPair</title>
+    <link rel="stylesheet" href="~/css/auth-login.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="auth-shell">
+        <header class="auth-header">
+            <a class="brand" asp-controller="Home" asp-action="Index" aria-label="WatchPair home">
+                <span class="brand-mark" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                </span>
+                <span class="brand-name">WatchPair</span>
+            </a>
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-error">@ViewBag.Error</div>
-        }
-        @if (ViewBag.Info != null)
-        {
-            <div class="alert alert-info">@ViewBag.Info</div>
-        }
-        @if (TempData["Info"] != null)
-        {
-            <div class="alert alert-info">@TempData["Info"]</div>
-        }
+            <a class="home-link" asp-controller="Home" asp-action="Index">
+                Back to Home
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
+            </a>
+        </header>
 
-        <form asp-action="Login" method="post">
-            <div class="form-group">
-                <label>نام کاربری</label>
-                <input asp-for="Username" placeholder="نام کاربری خود را وارد کنید" autocomplete="username" />
-            </div>
+        <main class="auth-main">
+            <section class="auth-story" aria-labelledby="story-title">
+                <img class="story-artwork"
+                     src="~/images/auth/login-discovery.webp"
+                     asp-append-version="true"
+                     alt=""
+                     aria-hidden="true" />
 
-            <div class="form-group">
-                <label>رمز عبور</label>
-                <input asp-for="Password" type="password" placeholder="رمز عبور خود را وارد کنید" autocomplete="current-password" />
-            </div>
+                <div class="story-copy">
+                    <h1 id="story-title">Find what feels right.</h1>
+                    <p class="story-description">
+                        Personal recommendations shaped by your mood and experiences.
+                    </p>
 
-            <button type="submit" class="btn">ورود</button>
-        </form>
+                    <div class="mood-list" aria-label="Example moods">
+                        <span class="mood mood-cozy">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z" />
+                                <path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 5V3m4 2V3" />
+                            </svg>
+                            Cozy
+                        </span>
+                        <span class="mood mood-hopeful">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+                            </svg>
+                            Hopeful
+                        </span>
+                        <span class="mood mood-inspired">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z" />
+                            </svg>
+                            Inspired
+                        </span>
+                    </div>
+                </div>
+            </section>
 
-        <div class="auth-links">
-            حساب کاربری ندارید؟
-            <a asp-action="Register">ثبت‌نام کنید</a>
-        </div>
+            <section class="login-panel" aria-labelledby="login-title">
+                <div class="login-card">
+                    <div class="login-heading">
+                        <h2 id="login-title">Welcome back</h2>
+                        <p>Sign in to continue to WatchPair.</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="auth-alert auth-alert-error" role="alert">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v6m0 4h.01" /></svg>
+                            <span>@ViewBag.Error</span>
+                        </div>
+                    }
+                    @if (ViewBag.Info != null)
+                    {
+                        <div class="auth-alert auth-alert-info" role="status">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10h.01" /></svg>
+                            <span>@ViewBag.Info</span>
+                        </div>
+                    }
+                    @if (TempData["Info"] != null)
+                    {
+                        <div class="auth-alert auth-alert-info" role="status">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10h.01" /></svg>
+                            <span>@TempData["Info"]</span>
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post" class="login-form" id="login-form">
+                        <div class="field-group">
+                            <label asp-for="Username">Username</label>
+                            <div class="field-control">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="12" cy="8" r="4" />
+                                    <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+                                </svg>
+                                <input asp-for="Username"
+                                       placeholder="Enter your username"
+                                       autocomplete="username"
+                                       spellcheck="false"
+                                       autofocus
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label asp-for="Password">Password</label>
+                            <div class="field-control">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="5" y="10" width="14" height="11" rx="2" />
+                                    <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2" />
+                                </svg>
+                                <input asp-for="Password"
+                                       type="password"
+                                       placeholder="Enter your password"
+                                       autocomplete="current-password"
+                                       minlength="6"
+                                       required />
+                                <button class="password-toggle"
+                                        type="button"
+                                        aria-label="Show password"
+                                        aria-pressed="false">
+                                    <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                                        <circle cx="12" cy="12" r="2.5" />
+                                    </svg>
+                                    <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="m4 4 16 16M10.7 6.1A9.8 9.8 0 0 1 12 6c6 0 9.5 6 9.5 6a15 15 0 0 1-2.2 2.8M6.6 6.6C4 8.3 2.5 12 2.5 12s3.5 6 9.5 6a9 9 0 0 0 3-.5M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button" id="login-submit">
+                            <span class="submit-label">Sign in</span>
+                            <span class="submit-spinner" aria-hidden="true"></span>
+                        </button>
+                    </form>
+
+                    <div class="register-prompt">
+                        <span>New to WatchPair?</span>
+                        <a asp-action="Register">Create an account</a>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-</div>
+
+    <script src="~/js/auth-login.js" asp-append-version="true"></script>
+</body>
+</html>
