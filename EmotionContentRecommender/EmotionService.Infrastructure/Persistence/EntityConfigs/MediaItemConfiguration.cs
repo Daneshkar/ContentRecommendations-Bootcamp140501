@@ -36,5 +36,12 @@ public class MediaItemConfiguration
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt);
+
+        builder.HasIndex(x => new
+        {
+            x.ItemTypeId,
+            x.Status,
+            x.Id
+        });
     }
 }

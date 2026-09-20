@@ -33,6 +33,17 @@ public sealed class ItemThemeWeightConfiguration
             x.ThemeId
         }).IsUnique();
 
+        builder.HasIndex(x => new
+        {
+            x.ThemeId,
+            x.MediaItemId
+        })
+            .IncludeProperties(x => new
+            {
+                x.WeightValue,
+                x.ExperienceCount
+            });
+
         builder.HasOne(x => x.MediaItem)
             .WithMany()
             .HasForeignKey(x => x.MediaItemId)

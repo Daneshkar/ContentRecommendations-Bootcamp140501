@@ -33,6 +33,17 @@ public sealed class ItemMoodWeightConfiguration
             x.MoodId
         }).IsUnique();
 
+        builder.HasIndex(x => new
+        {
+            x.MoodId,
+            x.MediaItemId
+        })
+            .IncludeProperties(x => new
+            {
+                x.WeightValue,
+                x.ExperienceCount
+            });
+
         builder.HasOne(x => x.MediaItem)
             .WithMany()
             .HasForeignKey(x => x.MediaItemId)
