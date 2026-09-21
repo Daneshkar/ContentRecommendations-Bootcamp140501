@@ -123,6 +123,11 @@ public sealed class UserExperienceSummary
     public string MediaItemName { get; set; } = string.Empty;
     public string? MediaItemImageUrl { get; set; }
     public int Score { get; set; }
+    public string? Note { get; set; }
+    public List<ExperienceHistoryTag> Moods { get; set; } = [];
+    public List<ExperienceHistoryTag> Themes { get; set; } = [];
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
 
 public sealed class CreateExperienceResponse

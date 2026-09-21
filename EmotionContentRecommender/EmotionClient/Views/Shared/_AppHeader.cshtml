@@ -1,3 +1,7 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
 <header class="app-header">
     <a class="app-brand" asp-controller="Home" asp-action="Index" aria-label="WatchPair home">
         <span class="app-brand-mark" aria-hidden="true"><span></span><span></span></span>
@@ -5,8 +9,14 @@
     </a>
 
     <nav class="app-navigation" aria-label="Primary navigation">
-        <a asp-controller="Home" asp-action="Index">Home</a>
-        <span class="app-nav-future" title="Experience history is coming next">History</span>
+        <a class="@(string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase) ? "is-active" : null)"
+           asp-controller="Home"
+           asp-action="Index"
+           aria-current="@(string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase) ? "page" : null)">Home</a>
+        <a class="@(string.Equals(currentController, "History", StringComparison.OrdinalIgnoreCase) ? "is-active" : null)"
+           asp-controller="History"
+           asp-action="Index"
+           aria-current="@(string.Equals(currentController, "History", StringComparison.OrdinalIgnoreCase) ? "page" : null)">History</a>
     </nav>
 
     <div class="app-account">

@@ -157,6 +157,7 @@ svg {
 
 .app-navigation a,
 .app-nav-future {
+    position: relative;
     color: #b8bdd7;
     font-size: 14px;
     text-decoration: none;
@@ -164,6 +165,21 @@ svg {
 
 .app-navigation a:hover {
     color: #fff;
+}
+
+.app-navigation a.is-active {
+    color: #fff;
+}
+
+.app-navigation a.is-active::after {
+    position: absolute;
+    right: 0;
+    bottom: -31px;
+    left: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--coral), var(--pink));
+    content: "";
 }
 
 .app-nav-future {
