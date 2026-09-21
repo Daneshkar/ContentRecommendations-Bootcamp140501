@@ -1,0 +1,283 @@
+@model MoodRecommendationPageViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Choose your mood";
+    var featuredMoods = ViewData["FeaturedMoods"] as HashSet<string> ?? [];
+    var selectedThemeIds = Model.Selection.ThemeIds.ToHashSet();
+    var selectedCategory = RecommendationCatalog.Categories.FirstOrDefault(category => category.Id == Model.Selection.ItemTypeId);
+    var selectedMood = Model.Moods.FirstOrDefault(mood => mood.Id == Model.Selection.PrimaryMoodId);
+    var selectedAdditionalMoods = Model.Moods
+        .Where(mood => Model.Selection.AdditionalMoodIds.Contains(mood.Id))
+        .ToArray();
+    var selectedMoodIds = Model.Selection.AdditionalMoodIds
+        .Prepend(Model.Selection.PrimaryMoodId)
+        .Where(id => id > 0)
+        .ToHashSet();
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Choose a mood and discover your next movie, book, game, or track with WatchPair." />
+    <title>@ViewData["Title"] — WatchPair</title>
+    <link rel="stylesheet" href="~/css/recommendation.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="recommendation-shell mood-page">
+        <partial name="_AppHeader" />
+
+        <main class="recommendation-main">
+            <section class="page-intro">
+                <p class="page-kicker">MOOD MATCHING</p>
+                <h1>Choose your mood</h1>
+                <p>Tell us what feels right today. We will find one thoughtful match at a time.</p>
+            </section>
+
+            @if (Model.LookupError is not null)
+            {
+                <section class="state-card state-error" role="alert">
+                    <span class="state-icon" aria-hidden="true">!</span>
+                    <div>
+                        <h2>We could not load your choices</h2>
+                        <p>@Model.LookupError</p>
+                    </div>
+                    <a asp-action="Mood">Try again</a>
+                </section>
+            }
+            else
+            {
+                <form asp-action="Mood" method="post" id="mood-recommendation-form" novalidate>
+                    <input type="hidden" name="PrimaryMoodId" id="primary-mood-id" value="@Model.Selection.PrimaryMoodId" />
+                    <div id="additional-mood-inputs">
+                        @foreach (var moodId in Model.Selection.AdditionalMoodIds.Distinct())
+                        {
+                            <input type="hidden" name="AdditionalMoodIds" value="@moodId" />
+                        }
+                    </div>
+                    <div class="mood-layout">
+                        <div class="choice-flow">
+                            @if (Model.SubmissionError is not null)
+                            {
+                                <div class="inline-alert" role="alert">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v6m0 4h.01" /></svg>
+                                    <span>@Model.SubmissionError</span>
+                                </div>
+                            }
+
+                            <section class="choice-section" aria-labelledby="category-heading">
+                                <div class="step-heading">
+                                    <span>1</span>
+                                    <div>
+                                        <h2 id="category-heading">What are you looking for?</h2>
+                                        <p>Choose one type of content.</p>
+                                    </div>
+                                </div>
+
+                                <div class="category-grid" id="category-options">
+                                    @foreach (var category in RecommendationCatalog.Categories)
+                                    {
+                                        <label class="category-card category-@category.CssClass">
+                                            <input type="radio"
+                                                   name="ItemTypeId"
+                                                   value="@category.Id"
+                                                   data-name="@category.Name"
+                                                   checked="@(Model.Selection.ItemTypeId == category.Id)" />
+                                            <span class="category-art" aria-hidden="true"></span>
+                                            <span class="category-content">
+                                                <span class="category-icon" aria-hidden="true">
+                                                    @if (category.CssClass == "movie")
+                                                    {
+                                                        <svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM4 11h16M7 4l2 3m3-3 2 3m3-3 2 3" /></svg>
+                                                    }
+                                                    else if (category.CssClass == "book")
+                                                    {
+                                                        <svg viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H11v17H7.5A3.5 3.5 0 0 0 4 22V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H13v17h3.5A3.5 3.5 0 0 1 20 22V5.5Z" /></svg>
+                                                    }
+                                                    else if (category.CssClass == "game")
+                                                    {
+                                                        <svg viewBox="0 0 24 24"><path d="M8 8h8a5 5 0 0 1 4.7 3.3l1.1 3.2A3.4 3.4 0 0 1 18.6 19c-1 0-1.9-.4-2.5-1.1L14.4 16H9.6l-1.7 1.9A3.4 3.4 0 0 1 2.2 14.5l1.1-3.2A5 5 0 0 1 8 8Z" /><path d="M8 11v4m-2-2h4m7-1h.01m2 2h.01" /></svg>
+                                                    }
+                                                    else
+                                                    {
+                                                        <svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13M9 10l10-2" /><circle cx="6" cy="18" r="3" /><circle cx="16" cy="16" r="3" /></svg>
+                                                    }
+                                                </span>
+                                                <strong>@category.Name</strong>
+                                                <small>@category.Description</small>
+                                            </span>
+                                            <span class="selection-check" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg>
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                                <p class="field-error" id="category-error" aria-live="polite"></p>
+                            </section>
+
+                            <section class="choice-section mood-choice-section" aria-labelledby="mood-heading">
+                                <div class="step-heading step-heading-with-search">
+                                    <span>2</span>
+                                    <div>
+                                        <h2 id="mood-heading">How do you want to feel?</h2>
+                                        <p>Choose up to three. Your first choice becomes the primary mood.</p>
+                                    </div>
+                                    <label class="mood-search">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                                        <span class="sr-only">Search moods</span>
+                                        <input type="search" id="mood-search" placeholder="Search all moods" autocomplete="off" />
+                                    </label>
+                                </div>
+
+                                <div class="mood-grid" id="mood-options">
+                                    @foreach (var mood in Model.Moods)
+                                    {
+                                        var isFeatured = featuredMoods.Contains(mood.Name);
+                                        <label class="mood-chip @(isFeatured ? "is-featured" : "is-secondary")"
+                                               data-mood-name="@mood.Name.ToLowerInvariant()">
+                                            <input type="checkbox"
+                                                   class="mood-selection-input"
+                                                   value="@mood.Id"
+                                                   data-name="@mood.Name"
+                                                   checked="@selectedMoodIds.Contains(mood.Id)" />
+                                            <span class="mood-orbit" aria-hidden="true"></span>
+                                            <strong>@mood.Name</strong>
+                                            <span class="mood-role" data-mood-role>
+                                                @(Model.Selection.PrimaryMoodId == mood.Id
+                                                    ? "Primary"
+                                                    : Model.Selection.AdditionalMoodIds.Contains(mood.Id)
+                                                        ? "Additional"
+                                                        : string.Empty)
+                                            </span>
+                                            @if (!string.IsNullOrWhiteSpace(mood.Description))
+                                            {
+                                                <small>@mood.Description</small>
+                                            }
+                                            <span class="selection-check" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg>
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                                <div class="mood-tools">
+                                    <button type="button" class="text-button" id="browse-moods" aria-expanded="false">
+                                        Browse all @Model.Moods.Count moods
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                                    </button>
+                                    <p class="mood-search-empty" id="mood-search-empty" hidden>No moods match that search.</p>
+                                </div>
+                                <p class="field-error" id="mood-error" aria-live="polite"></p>
+                            </section>
+
+                            <section class="choice-section" aria-labelledby="theme-heading">
+                                <div class="step-heading">
+                                    <span>3</span>
+                                    <div>
+                                        <h2 id="theme-heading">Add themes <em>Optional</em></h2>
+                                        <p>Choose up to five ideas you want the match to explore.</p>
+                                    </div>
+                                </div>
+
+                                <div class="theme-picker" id="theme-picker">
+                                    <button type="button" class="theme-trigger" id="theme-trigger" aria-expanded="false" aria-controls="theme-menu">
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4" /></svg>
+                                            <span id="theme-trigger-label">@(selectedThemeIds.Count == 0 ? "Any theme" : $"{selectedThemeIds.Count} themes selected")</span>
+                                        </span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                                    </button>
+
+                                    <div class="theme-menu" id="theme-menu" hidden>
+                                        <div class="theme-menu-heading">
+                                            <strong>Choose themes</strong>
+                                            <span><b id="theme-count">@selectedThemeIds.Count</b>/5 selected</span>
+                                        </div>
+                                        <label class="theme-search">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                                            <span class="sr-only">Search themes</span>
+                                            <input type="search" id="theme-search" placeholder="Search themes" autocomplete="off" />
+                                        </label>
+                                        <div class="theme-options" id="theme-options">
+                                            @foreach (var theme in Model.Themes)
+                                            {
+                                                <label data-theme-name="@theme.Name.ToLowerInvariant()">
+                                                    <input type="checkbox"
+                                                           name="ThemeIds"
+                                                           value="@theme.Id"
+                                                           data-name="@theme.Name"
+                                                           checked="@selectedThemeIds.Contains(theme.Id)" />
+                                                    <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg></span>
+                                                    <span>
+                                                        <strong>@theme.Name</strong>
+                                                        @if (!string.IsNullOrWhiteSpace(theme.Description))
+                                                        {
+                                                            <small>@theme.Description</small>
+                                                        }
+                                                    </span>
+                                                </label>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="selected-themes" id="selected-themes" aria-live="polite"></div>
+                                <p class="field-error" id="theme-error" aria-live="polite"></p>
+                            </section>
+                        </div>
+
+                        <aside class="match-summary" aria-labelledby="summary-heading">
+                            <div class="summary-glow" aria-hidden="true"></div>
+                            <p class="summary-kicker">YOUR MATCH</p>
+                            <h2 id="summary-heading">Ready when you are</h2>
+                            <p class="summary-copy">Your choices shape a focused recommendation made for this moment.</p>
+
+                            <dl class="summary-list">
+                                <div>
+                                    <dt>Category</dt>
+                                    <dd id="summary-category">@(selectedCategory?.Name ?? "Not selected")</dd>
+                                </div>
+                                <div>
+                                    <dt>Primary mood</dt>
+                                    <dd id="summary-mood">@(selectedMood?.Name ?? "Not selected")</dd>
+                                </div>
+                                <div>
+                                    <dt>Additional</dt>
+                                    <dd id="summary-additional-moods">
+                                        @(selectedAdditionalMoods.Length == 0
+                                            ? "None"
+                                            : string.Join(", ", selectedAdditionalMoods.Select(mood => mood.Name)))
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Themes</dt>
+                                    <dd id="summary-themes">@(selectedThemeIds.Count == 0 ? "Any" : $"{selectedThemeIds.Count} selected")</dd>
+                                </div>
+                            </dl>
+
+                            <button type="submit" class="match-button" id="find-match-button">
+                                <span>Find my match</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+                                <span class="button-spinner" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="clear-button" id="clear-selections">Clear selections</button>
+
+                            <div class="summary-note">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z" /></svg>
+                                <span>One focused recommendation at a time. Use <strong>Try another</strong> whenever you want a fresh match.</span>
+                            </div>
+                        </aside>
+                    </div>
+                </form>
+            }
+        </main>
+
+        <div class="loading-screen" id="loading-screen" hidden aria-live="polite" aria-label="Finding your match">
+            <div class="loading-orbit"><span></span><span></span><span></span></div>
+            <strong>Finding what feels right...</strong>
+            <p>Matching your mood with something worth discovering.</p>
+        </div>
+    </div>
+
+    <script src="~/js/mood-recommendation.js" asp-append-version="true"></script>
+</body>
+</html>

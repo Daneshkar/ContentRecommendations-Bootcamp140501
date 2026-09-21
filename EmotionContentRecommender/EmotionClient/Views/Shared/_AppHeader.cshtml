@@ -1,0 +1,20 @@
+<header class="app-header">
+    <a class="app-brand" asp-controller="Home" asp-action="Index" aria-label="WatchPair home">
+        <span class="app-brand-mark" aria-hidden="true"><span></span><span></span></span>
+        <span>WatchPair</span>
+    </a>
+
+    <nav class="app-navigation" aria-label="Primary navigation">
+        <a asp-controller="Home" asp-action="Index">Home</a>
+        <span class="app-nav-future" title="Experience history is coming next">History</span>
+    </nav>
+
+    <div class="app-account">
+        <span class="app-account-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></svg>
+        </span>
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit">Sign out</button>
+        </form>
+    </div>
+</header>

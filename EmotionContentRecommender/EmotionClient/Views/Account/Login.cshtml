@@ -100,6 +100,7 @@
                     }
 
                     <form asp-action="Login" method="post" class="login-form" id="login-form">
+                        <input asp-for="ReturnUrl" type="hidden" />
                         <div class="field-group">
                             <label asp-for="Username">Username</label>
                             <div class="field-control">

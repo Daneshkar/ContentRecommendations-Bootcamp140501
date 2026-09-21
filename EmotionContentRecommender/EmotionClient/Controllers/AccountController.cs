@@ -14,9 +14,12 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Login()
+    public IActionResult Login(string? returnUrl = null)
     {
-        return View(new LoginViewModel());
+        return View(new LoginViewModel
+        {
+            ReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null
+        });
     }
 
     [HttpPost]
@@ -31,6 +34,9 @@ public class AccountController : Controller
         }
 
         ForwardAuthCookies(result.Cookies);
+
+        if (Url.IsLocalUrl(model.ReturnUrl))
+            return LocalRedirect(model.ReturnUrl);
 
         return RedirectToAction("Index", "Home");
     }

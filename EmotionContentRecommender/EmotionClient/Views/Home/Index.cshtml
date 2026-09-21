@@ -53,11 +53,11 @@
                         </p>
 
                         <div class="hero-actions">
-                            <a class="button button-primary button-large" href="#discover">
+                            <a class="button button-primary button-large" asp-controller="Recommendation" asp-action="Mood">
                                 Start with a Mood
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
                             </a>
-                            <a class="button button-secondary button-large" href="#discover">Share an Experience</a>
+                            <a class="button button-secondary button-large" asp-controller="Recommendation" asp-action="Experience">Share an Experience</a>
                         </div>
 
                         <div class="hero-note">
@@ -89,7 +89,7 @@
                                 </span>
                                 <h3>Choose by Mood</h3>
                                 <p>Pick how you feel and let WatchPair find the right match.</p>
-                                <a asp-controller="Account" asp-action="Login">
+                                <a asp-controller="Recommendation" asp-action="Mood">
                                     Start with a Mood
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
                                 </a>
@@ -104,7 +104,7 @@
                                 </span>
                                 <h3>Start from an Experience</h3>
                                 <p>Tell us what stayed with you and discover something with a similar emotional tone.</p>
-                                <a asp-controller="Account" asp-action="Login">
+                                <a asp-controller="Recommendation" asp-action="Experience">
                                     Share an Experience
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
                                 </a>
@@ -275,7 +275,7 @@
                     <h2 id="cta-title">Ready to find your next favorite?</h2>
                     <p>Let your emotions guide you to something extraordinary.</p>
                     <div class="cta-actions">
-                        <a class="button button-primary button-large" href="#discover">
+                        <a class="button button-primary button-large" asp-controller="Recommendation" asp-action="Mood">
                             Start discovering
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
                         </a>
