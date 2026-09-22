@@ -1,0 +1,335 @@
+@model RecommendationResultViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Your match";
+    var item = Model.Item;
+    var isExperience = Model.IsExperience;
+    var moodCriteria = Model.Response?.Criteria;
+    var experienceCriteria = Model.ExperienceResponse?.Criteria;
+    var category = experienceCriteria?.ItemType.Name
+        ?? moodCriteria?.ItemType.Name
+        ?? RecommendationCatalog.Categories.FirstOrDefault(option => option.Id == Model.Selection.ItemTypeId)?.Name
+        ?? "Content";
+    var primaryMood = moodCriteria?.PrimaryMood.Name ?? "your mood";
+    var additionalMoods = moodCriteria?.AdditionalMoods ?? [];
+    var moods = isExperience
+        ? experienceCriteria?.Moods ?? []
+        : new[] { moodCriteria?.PrimaryMood }
+            .Where(value => value is not null)
+            .Cast<RecommendationNamedValue>()
+            .Concat(additionalMoods)
+            .ToList();
+    var themes = experienceCriteria?.Themes ?? moodCriteria?.Themes ?? [];
+    var sourceTitle = experienceCriteria?.SourceMediaItem.Name ?? "your experience";
+    string? supportingLine = null;
+    string? longDescription = item?.Description;
+
+    if (item?.Details is MovieRecommendationDetails movie)
+    {
+        supportingLine = movie.DurationMinutes > 0
+            ? $"{movie.ReleaseYear?.ToString() ?? item.ReleaseDate?.Year.ToString()} · {movie.DurationMinutes / 60}h {movie.DurationMinutes % 60}m"
+            : movie.ReleaseYear?.ToString();
+        longDescription ??= movie.Synopsis;
+    }
+    else if (item?.Details is BookRecommendationDetails book)
+    {
+        supportingLine = string.Join(" · ", new[] { book.Author, book.PageCount is > 0 ? $"{book.PageCount} pages" : null }.Where(value => !string.IsNullOrWhiteSpace(value)));
+        longDescription ??= book.Description;
+    }
+    else if (item?.Details is GameRecommendationDetails game)
+    {
+        supportingLine = string.Join(" · ", new[] { game.ReleaseYear?.ToString(), game.Platform }.Where(value => !string.IsNullOrWhiteSpace(value)));
+        longDescription ??= game.Description;
+    }
+    else if (item?.Details is MusicRecommendationDetails music)
+    {
+        var duration = music.DurationSeconds > 0 ? $"{music.DurationSeconds / 60}:{music.DurationSeconds % 60:00}" : null;
+        supportingLine = string.Join(" · ", new[] { music.Artist, music.Album, duration }.Where(value => !string.IsNullOrWhiteSpace(value)));
+        longDescription ??= music.Description;
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — WatchPair</title>
+    <link rel="stylesheet" href="~/css/recommendation.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="recommendation-shell result-page">
+        <partial name="_AppHeader" />
+
+        <main class="result-main">
+            @if (isExperience)
+            {
+                <a asp-action="Experience" class="edit-choices-form edit-choices-link">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m5-5-5 5 5 5" /></svg>
+                    Choose another experience
+                </a>
+            }
+            else
+            {
+                <form asp-action="Mood" method="get" class="edit-choices-form">
+                    <input type="hidden" name="ItemTypeId" value="@Model.Selection.ItemTypeId" />
+                    <input type="hidden" name="PrimaryMoodId" value="@Model.Selection.PrimaryMoodId" />
+                    @foreach (var additionalMoodId in Model.Selection.AdditionalMoodIds.Distinct())
+                    {
+                        <input type="hidden" name="AdditionalMoodIds" value="@additionalMoodId" />
+                    }
+                    @foreach (var themeId in Model.Selection.ThemeIds.Distinct())
+                    {
+                        <input type="hidden" name="ThemeIds" value="@themeId" />
+                    }
+                    <button type="submit">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m5-5-5 5 5 5" /></svg>
+                        Edit choices
+                    </button>
+                </form>
+            }
+
+            @if (item is not null)
+            {
+                <section class="result-intro">
+                    <p class="page-kicker">YOUR RECOMMENDATION</p>
+                    <h1>Your match is ready</h1>
+                    <p>
+                        @if (isExperience)
+                        {
+                            <text>A @category.ToLowerInvariant() inspired by <strong>@sourceTitle</strong>.</text>
+                        }
+                        else
+                        {
+                            <text>A @category.ToLowerInvariant() picked for your @primaryMood mood.</text>
+                        }
+                    </p>
+                </section>
+
+                <div class="result-layout">
+                    <article class="result-card">
+                        <div class="result-backdrop @(string.IsNullOrWhiteSpace(item.CoverUrl) ? "has-fallback" : null)"
+                             @if (!string.IsNullOrWhiteSpace(item.CoverUrl))
+                             {
+                                 <text>style="--result-image: url('@item.CoverUrl')"</text>
+                             }>
+                        </div>
+                        <div class="result-card-overlay" aria-hidden="true"></div>
+
+                        <div class="result-content">
+                            <div class="result-cover @(string.IsNullOrWhiteSpace(item.CoverUrl) ? "has-fallback" : null)">
+                                @if (!string.IsNullOrWhiteSpace(item.CoverUrl))
+                                {
+                                    <img src="@item.CoverUrl" alt="Cover art for @item.Name" referrerpolicy="no-referrer" />
+                                }
+                                <span class="cover-fallback" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 15l3-3 3 3 2-2 2 2M8 9h.01" /></svg>
+                                    @category
+                                </span>
+                            </div>
+
+                            <div class="result-copy">
+                                <span class="result-type">@category.ToUpperInvariant()</span>
+                                <h2>@item.Name</h2>
+                                @if (!string.IsNullOrWhiteSpace(supportingLine))
+                                {
+                                    <p class="result-meta">@supportingLine</p>
+                                }
+
+                                <div class="result-tags" aria-label="Recommendation tags">
+                                    @foreach (var selectedMood in moods.Take(2))
+                                    {
+                                        <span class="tag tag-mood">@selectedMood.Name</span>
+                                    }
+                                    @foreach (var genre in item.Genres.Take(2))
+                                    {
+                                        <span class="tag">@genre.Name</span>
+                                    }
+                                    @foreach (var theme in item.RecommendationContext.MatchedThemes.Take(1))
+                                    {
+                                        <span class="tag tag-theme">@theme.Name</span>
+                                    }
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(longDescription))
+                                {
+                                    <p class="result-description">@longDescription</p>
+                                }
+
+                                <div class="result-actions">
+                                    <button type="button" class="details-button" id="open-details">
+                                        View details
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+                                    </button>
+
+                                    @if (Model.HasMore && !string.IsNullOrWhiteSpace(Model.NextCursor))
+                                    {
+                                        @if (isExperience && Model.ExperienceSelection is not null)
+                                        {
+                                            <form asp-action="NextExperience" method="post" class="next-form" id="next-form">
+                                                <input type="hidden" name="ExperienceId" value="@Model.ExperienceSelection.ExperienceId" />
+                                                <input type="hidden" name="Cursor" value="@Model.NextCursor" />
+                                                <button type="submit" class="try-another-button">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5" /><path d="M7.2 8.4A7 7 0 0 1 19.5 12M4.5 12a7 7 0 0 0 12.3 3.6" /></svg>
+                                                    <span>Try another</span><span class="button-spinner" aria-hidden="true"></span>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Next" method="post" class="next-form" id="next-form">
+                                                <input type="hidden" name="ItemTypeId" value="@Model.Selection.ItemTypeId" />
+                                                <input type="hidden" name="PrimaryMoodId" value="@Model.Selection.PrimaryMoodId" />
+                                                <input type="hidden" name="Cursor" value="@Model.NextCursor" />
+                                                @foreach (var additionalMoodId in Model.Selection.AdditionalMoodIds.Distinct())
+                                                {
+                                                    <input type="hidden" name="AdditionalMoodIds" value="@additionalMoodId" />
+                                                }
+                                                @foreach (var themeId in Model.Selection.ThemeIds.Distinct())
+                                                {
+                                                    <input type="hidden" name="ThemeIds" value="@themeId" />
+                                                }
+                                                <button type="submit" class="try-another-button">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5" /><path d="M7.2 8.4A7 7 0 0 1 19.5 12M4.5 12a7 7 0 0 0 12.3 3.6" /></svg>
+                                                    <span>Try another</span><span class="button-spinner" aria-hidden="true"></span>
+                                                </button>
+                                            </form>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="end-of-matches">You have seen every match for these choices.</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <aside class="choices-card">
+                        <p class="summary-kicker">@(isExperience ? "YOUR EXPERIENCE" : "YOUR CHOICES")</p>
+                        <h2>Why this match?</h2>
+                        <dl>
+                            @if (isExperience)
+                            {
+                                <div><dt>Starting point</dt><dd>@sourceTitle</dd></div>
+                                <div><dt>Moods</dt><dd>@(moods.Count == 0 ? "Not specified" : string.Join(", ", moods.Select(value => value.Name)))</dd></div>
+                                <div><dt>Themes</dt><dd>@(themes.Count == 0 ? "Any" : string.Join(", ", themes.Select(value => value.Name)))</dd></div>
+                            }
+                            else
+                            {
+                                <div><dt>Category</dt><dd>@category</dd></div>
+                                <div><dt>Primary mood</dt><dd>@primaryMood</dd></div>
+                                <div><dt>Additional</dt><dd>@(additionalMoods.Count == 0 ? "None" : string.Join(", ", additionalMoods.Select(value => value.Name)))</dd></div>
+                                <div><dt>Themes</dt><dd>@(themes.Count == 0 ? "Any" : string.Join(", ", themes.Select(value => value.Name)))</dd></div>
+                            }
+                        </dl>
+                        <p class="choices-note">
+                            @(isExperience
+                                ? "This recommendation reflects the moods and themes from your saved experience. Previously experienced items are left out."
+                                : "This recommendation is ranked from your primary mood, additional moods, and optional themes. Previously experienced items are left out.")
+                        </p>
+                    </aside>
+                </div>
+
+                <dialog class="details-dialog" id="details-dialog">
+                    <div class="details-dialog-inner">
+                        <button type="button" class="dialog-close" id="close-details" aria-label="Close details">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                        </button>
+                        <p class="page-kicker">@category.ToUpperInvariant() DETAILS</p>
+                        <h2>@item.Name</h2>
+                        @if (!string.IsNullOrWhiteSpace(longDescription))
+                        {
+                            <p class="dialog-description">@longDescription</p>
+                        }
+                        <dl class="details-grid">
+                            @if (item.Details is MovieRecommendationDetails movieDetails)
+                            {
+                                <div><dt>Director</dt><dd>@movieDetails.Director</dd></div>
+                                <div><dt>Release year</dt><dd>@movieDetails.ReleaseYear</dd></div>
+                                <div><dt>Runtime</dt><dd>@movieDetails.DurationMinutes minutes</dd></div>
+                                <div><dt>Language</dt><dd>@(movieDetails.Language ?? "Not specified")</dd></div>
+                                <div><dt>Country</dt><dd>@(movieDetails.Country ?? "Not specified")</dd></div>
+                                <div><dt>Age rating</dt><dd>@(movieDetails.AgeRating ?? "Not specified")</dd></div>
+                            }
+                            else if (item.Details is BookRecommendationDetails bookDetails)
+                            {
+                                <div><dt>Author</dt><dd>@bookDetails.Author</dd></div>
+                                <div><dt>Publisher</dt><dd>@bookDetails.Publisher</dd></div>
+                                <div><dt>Published</dt><dd>@bookDetails.PublicationDate?.ToString("MMMM d, yyyy")</dd></div>
+                                <div><dt>Pages</dt><dd>@(bookDetails.PageCount?.ToString() ?? "Not specified")</dd></div>
+                                <div><dt>Language</dt><dd>@bookDetails.Language</dd></div>
+                                <div><dt>ISBN</dt><dd>@bookDetails.Isbn</dd></div>
+                            }
+                            else if (item.Details is GameRecommendationDetails gameDetails)
+                            {
+                                <div><dt>Developer</dt><dd>@gameDetails.Developer</dd></div>
+                                <div><dt>Publisher</dt><dd>@gameDetails.Publisher</dd></div>
+                                <div><dt>Release year</dt><dd>@gameDetails.ReleaseYear</dd></div>
+                                <div><dt>Platform</dt><dd>@gameDetails.Platform</dd></div>
+                                <div><dt>Game mode</dt><dd>@(gameDetails.GameMode ?? "Not specified")</dd></div>
+                                <div><dt>Age rating</dt><dd>@(gameDetails.AgeRating ?? "Not specified")</dd></div>
+                            }
+                            else if (item.Details is MusicRecommendationDetails musicDetails)
+                            {
+                                <div><dt>Artist</dt><dd>@musicDetails.Artist</dd></div>
+                                <div><dt>Album</dt><dd>@(musicDetails.Album ?? "Single")</dd></div>
+                                <div><dt>Release year</dt><dd>@musicDetails.ReleaseYear</dd></div>
+                                <div><dt>Duration</dt><dd>@(musicDetails.DurationSeconds / 60):@(musicDetails.DurationSeconds % 60).ToString("00")</dd></div>
+                                <div><dt>Publisher</dt><dd>@(musicDetails.Publisher ?? "Not specified")</dd></div>
+                                <div><dt>Language</dt><dd>@(musicDetails.Language ?? "Not specified")</dd></div>
+                            }
+                        </dl>
+                    </div>
+                </dialog>
+            }
+            else
+            {
+                var isError = Model.ErrorMessage is not null;
+                <section class="result-state @(isError ? "is-error" : "is-empty")">
+                    <div class="result-state-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+                    <p class="page-kicker">@(isError ? "SOMETHING WENT WRONG" : "NO MORE MATCHES")</p>
+                    <h1>@(isError ? "We could not load your match" : "You have explored every match")</h1>
+                    <p>@(Model.ErrorMessage ?? (isExperience ? "Try a different starting experience to discover something new." : "Try a different mood, category, or theme to discover something new."))</p>
+                    <div class="state-actions">
+                        @if (isError && isExperience && Model.ExperienceSelection is not null)
+                        {
+                            <form asp-action="NextExperience" method="post" id="next-form">
+                                <input type="hidden" name="ExperienceId" value="@Model.ExperienceSelection.ExperienceId" />
+                                <input type="hidden" name="Cursor" value="@Model.ExperienceSelection.Cursor" />
+                                <button type="submit" class="match-button">Try again</button>
+                            </form>
+                        }
+                        else if (isError && !string.IsNullOrWhiteSpace(Model.Selection.Cursor))
+                        {
+                            <form asp-action="Next" method="post" id="next-form">
+                                <input type="hidden" name="ItemTypeId" value="@Model.Selection.ItemTypeId" />
+                                <input type="hidden" name="PrimaryMoodId" value="@Model.Selection.PrimaryMoodId" />
+                                <input type="hidden" name="Cursor" value="@Model.Selection.Cursor" />
+                                @foreach (var additionalMoodId in Model.Selection.AdditionalMoodIds.Distinct())
+                                {
+                                    <input type="hidden" name="AdditionalMoodIds" value="@additionalMoodId" />
+                                }
+                                @foreach (var themeId in Model.Selection.ThemeIds.Distinct())
+                                {
+                                    <input type="hidden" name="ThemeIds" value="@themeId" />
+                                }
+                                <button type="submit" class="match-button">Try again</button>
+                            </form>
+                        }
+                        <a asp-action="@(isExperience ? "Experience" : "Mood")" class="details-button">Change choices</a>
+                    </div>
+                </section>
+            }
+        </main>
+
+        <div class="loading-screen" id="loading-screen" hidden aria-live="polite">
+            <div class="loading-orbit"><span></span><span></span><span></span></div>
+            <strong>Finding another match...</strong>
+            <p>Keeping the feeling, changing the story.</p>
+        </div>
+    </div>
+
+    <script src="~/js/recommendation-result.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -27,8 +27,38 @@ public class AuthApiService
 
     public async Task<AuthApiResponse<RegisterData>> RegisterAsync(RegisterViewModel model)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/api/auth/register", model);
-        return await DeserializeAsync<RegisterData>(response);
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/api/auth/register", model);
+            return await DeserializeAsync<RegisterData>(response);
+        }
+        catch (OperationCanceledException)
+        {
+            return new AuthApiResponse<RegisterData>
+            {
+                IsSuccess = false,
+                Message = "The authentication service took too long to respond.",
+                StatusCode = StatusCodes.Status504GatewayTimeout
+            };
+        }
+        catch (HttpRequestException)
+        {
+            return new AuthApiResponse<RegisterData>
+            {
+                IsSuccess = false,
+                Message = "The authentication service is currently unavailable.",
+                StatusCode = StatusCodes.Status503ServiceUnavailable
+            };
+        }
+        catch (JsonException)
+        {
+            return new AuthApiResponse<RegisterData>
+            {
+                IsSuccess = false,
+                Message = "The authentication service returned an unexpected response.",
+                StatusCode = StatusCodes.Status502BadGateway
+            };
+        }
     }
 
     public async Task<AuthApiResponse> SendOtpAsync(string mobile)

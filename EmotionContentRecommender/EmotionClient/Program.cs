@@ -9,6 +9,15 @@ builder.Services.AddHttpClient<AuthApiService>(client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
+builder.Services.AddHttpClient<EmotionApiService>((services, client) =>
+{
+    var configuration = services.GetRequiredService<IConfiguration>();
+    var baseUrl = configuration["EmotionService:BaseUrl"] ?? "http://localhost:5167";
+
+    client.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

@@ -1,0 +1,188 @@
+@model ExperienceEntryPageViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Share your experience";
+    var category = Model.MediaItem.Category;
+    var selectedMoodIds = Model.Entry.MoodIds.ToHashSet();
+    var selectedThemeIds = Model.Entry.ThemeIds.ToHashSet();
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — WatchPair</title>
+    <link rel="stylesheet" href="~/css/recommendation.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="recommendation-shell experience-entry-page">
+        <partial name="_AppHeader" />
+
+        <main class="experience-main experience-entry-main">
+            <a class="back-link" asp-action="Experience">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m5-5-5 5 5 5" /></svg>
+                Choose another title
+            </a>
+
+            <section class="experience-intro">
+                <p class="page-kicker">EXPERIENCE MATCHING</p>
+                <h1>Share your experience</h1>
+                <p>Tell us how <strong>@Model.MediaItem.Name</strong> made you feel.</p>
+            </section>
+
+            <form asp-action="CreateExperience" method="post" id="experience-entry-form" novalidate>
+                <input type="hidden" name="MediaItemId" value="@Model.MediaItem.Id" />
+
+                <div class="experience-entry-layout">
+                    <div class="experience-fields">
+                        @if (Model.ErrorMessage is not null)
+                        {
+                            <div class="inline-alert" role="alert">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v6m0 4h.01" /></svg>
+                                <span>@Model.ErrorMessage</span>
+                            </div>
+                        }
+
+                        <section class="experience-field-section" aria-labelledby="rating-heading">
+                            <div class="step-heading">
+                                <span>1</span>
+                                <div>
+                                    <h2 id="rating-heading">Your rating <em class="required-label">Required</em></h2>
+                                    <p>Every rating improves future matches. Ratings 4 and 5 also unlock an immediate recommendation.</p>
+                                </div>
+                            </div>
+
+                            <div class="rating-grid">
+                                @foreach (var rating in new[]
+                                {
+                                    (Value: 1, Label: "Not for me"),
+                                    (Value: 2, Label: "Didn't enjoy it"),
+                                    (Value: 3, Label: "It was okay"),
+                                    (Value: 4, Label: "Liked it"),
+                                    (Value: 5, Label: "Loved it")
+                                })
+                                {
+                                    <label class="rating-card">
+                                        <input type="radio"
+                                               name="Score"
+                                               value="@rating.Value"
+                                               checked="@(Model.Entry.Score == rating.Value)" />
+                                        <span class="rating-star" aria-hidden="true">★</span>
+                                        <strong>@rating.Value</strong>
+                                        <small>@rating.Label</small>
+                                    </label>
+                                }
+                            </div>
+                            <p class="field-error" id="rating-error" aria-live="polite"></p>
+                        </section>
+
+                        <section class="experience-field-section" aria-labelledby="experience-moods-heading">
+                            <div class="step-heading step-heading-with-search">
+                                <span>2</span>
+                                <div>
+                                    <h2 id="experience-moods-heading">Moods <em class="required-label">Required</em></h2>
+                                    <p>Choose up to three feelings that stood out.</p>
+                                </div>
+                                <label class="mood-search">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                                    <span class="sr-only">Search moods</span>
+                                    <input type="search" id="experience-mood-search" placeholder="Search moods..." autocomplete="off" />
+                                </label>
+                            </div>
+
+                            <div class="experience-chip-grid" id="experience-mood-options">
+                                @for (var index = 0; index < Model.Moods.Count; index++)
+                                {
+                                    var mood = Model.Moods[index];
+                                    <label class="experience-chip @(index >= 8 ? "is-overflow" : null)" data-name="@mood.Name.ToLowerInvariant()">
+                                        <input type="checkbox" name="MoodIds" value="@mood.Id" data-name="@mood.Name" checked="@selectedMoodIds.Contains(mood.Id)" />
+                                        <span class="chip-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg></span>
+                                        <strong>@mood.Name</strong>
+                                    </label>
+                                }
+                            </div>
+                            <button type="button" class="text-button experience-browse" data-browse-target="experience-mood-options" aria-expanded="false">
+                                Browse all moods
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                            </button>
+                            <p class="field-error" id="experience-mood-error" aria-live="polite"></p>
+                        </section>
+
+                        <section class="experience-field-section" aria-labelledby="experience-themes-heading">
+                            <div class="step-heading step-heading-with-search">
+                                <span>3</span>
+                                <div>
+                                    <h2 id="experience-themes-heading">Themes <em>Optional</em></h2>
+                                    <p>Choose up to five ideas that stayed with you.</p>
+                                </div>
+                                <label class="mood-search">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                                    <span class="sr-only">Search themes</span>
+                                    <input type="search" id="experience-theme-search" placeholder="Search themes..." autocomplete="off" />
+                                </label>
+                            </div>
+
+                            <div class="experience-chip-grid theme-chip-grid" id="experience-theme-options">
+                                @for (var index = 0; index < Model.Themes.Count; index++)
+                                {
+                                    var theme = Model.Themes[index];
+                                    <label class="experience-chip theme-chip @(index >= 8 ? "is-overflow" : null)" data-name="@theme.Name.ToLowerInvariant()">
+                                        <input type="checkbox" name="ThemeIds" value="@theme.Id" data-name="@theme.Name" checked="@selectedThemeIds.Contains(theme.Id)" />
+                                        <span class="chip-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg></span>
+                                        <strong>@theme.Name</strong>
+                                    </label>
+                                }
+                            </div>
+                            <button type="button" class="text-button experience-browse" data-browse-target="experience-theme-options" aria-expanded="false">
+                                Browse all themes
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                            </button>
+                            <p class="field-error" id="experience-theme-error" aria-live="polite"></p>
+                        </section>
+                    </div>
+
+                    <aside class="experience-summary entry-summary" aria-labelledby="experience-summary-heading">
+                        <p class="summary-kicker">YOUR EXPERIENCE</p>
+                        <h2 id="experience-summary-heading">The feeling behind the story</h2>
+
+                        <div class="experience-summary-cover">
+                            @if (!string.IsNullOrWhiteSpace(Model.MediaItem.CoverUrl))
+                            {
+                                <img src="@Model.MediaItem.CoverUrl" alt="Cover art for @Model.MediaItem.Name" referrerpolicy="no-referrer" />
+                            }
+                            <span class="cover-fallback" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 15l3-3 3 3 2-2 2 2M8 9h.01" /></svg>
+                                @(category?.Name ?? "Content")
+                            </span>
+                        </div>
+                        <h3>@Model.MediaItem.Name</h3>
+                        <p>@(category?.Name ?? "Content") @(Model.MediaItem.ReleaseDate.HasValue ? $"· {Model.MediaItem.ReleaseDate.Value.Year}" : string.Empty)</p>
+
+                        <dl class="experience-live-summary">
+                            <div><dt>Rating</dt><dd id="entry-summary-rating">@(Model.Entry.Score > 0 ? $"{Model.Entry.Score} / 5" : "Not selected")</dd></div>
+                            <div><dt>Moods</dt><dd id="entry-summary-moods">@(selectedMoodIds.Count == 0 ? "Not selected" : $"{selectedMoodIds.Count} selected")</dd></div>
+                            <div><dt>Themes</dt><dd id="entry-summary-themes">@(selectedThemeIds.Count == 0 ? "Any" : $"{selectedThemeIds.Count} selected")</dd></div>
+                        </dl>
+
+                        <button type="submit" class="experience-next-button" id="find-experience-match-button">
+                            <span id="experience-submit-label">Save my experience</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+                            <span class="button-spinner" aria-hidden="true"></span>
+                        </button>
+                        <p class="experience-summary-note">Your experience will be saved to History.</p>
+                    </aside>
+                </div>
+            </form>
+        </main>
+
+        <div class="loading-screen" id="loading-screen" hidden aria-live="polite">
+            <div class="loading-orbit"><span></span><span></span><span></span></div>
+            <strong>Saving your experience...</strong>
+            <p id="experience-loading-message">Adding your feedback to WatchPair.</p>
+        </div>
+    </div>
+
+    <script src="~/js/experience-entry.js" asp-append-version="true"></script>
+</body>
+</html>

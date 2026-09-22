@@ -1,0 +1,164 @@
+@model ExperienceStartPageViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Start from an experience";
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Choose something you have watched, read, played, or heard and find your next match." />
+    <title>@ViewData["Title"] — WatchPair</title>
+    <link rel="stylesheet" href="~/css/recommendation.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="recommendation-shell experience-start-page">
+        <partial name="_AppHeader" />
+
+        <main class="experience-main">
+            <a class="back-link" asp-controller="Home" asp-action="Index">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m5-5-5 5 5 5" /></svg>
+                Back to Home
+            </a>
+
+            <section class="experience-intro">
+                <p class="page-kicker">EXPERIENCE MATCHING</p>
+                <h1>Start from an experience</h1>
+                <p>Choose something you have watched, read, played, or heard.</p>
+            </section>
+
+            @if (Model.ErrorMessage is not null)
+            {
+                <div class="inline-alert experience-alert" role="alert">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v6m0 4h.01" /></svg>
+                    <span>@Model.ErrorMessage</span>
+                </div>
+            }
+
+            @if (Model.MediaItems.Count == 0)
+            {
+                <section class="result-state experience-empty">
+                    <div class="result-state-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+                    <p class="page-kicker">NOTHING NEW TO RATE</p>
+                    <h1>You have already shared every available experience</h1>
+                    <p>Your saved experiences will appear in History. Try mood matching for a different way to discover.</p>
+                    <div class="state-actions">
+                        <a asp-action="Mood" class="details-button">Start with a mood</a>
+                    </div>
+                </section>
+            }
+            else
+            {
+                <form asp-action="ShareExperience" method="post" id="experience-start-form" novalidate>
+                    <div class="experience-start-layout">
+                        <section class="experience-catalog" aria-labelledby="catalog-heading">
+                            <div class="catalog-tools">
+                                <label class="catalog-search">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                                    <span class="sr-only">Search by title</span>
+                                    <input type="search" id="media-search" placeholder="Search by title..." autocomplete="off" />
+                                </label>
+
+                                <div class="catalog-filters" role="group" aria-label="Filter by category">
+                                    <button type="button" class="is-active" data-category-filter="all">All</button>
+                                    @foreach (var category in RecommendationCatalog.Categories)
+                                    {
+                                        <button type="button" data-category-filter="@category.Id">@category.PluralName</button>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="catalog-heading-row">
+                                <div>
+                                    <p class="page-kicker">YOUR STARTING POINT</p>
+                                    <h2 id="catalog-heading">Choose a title</h2>
+                                </div>
+                                <span id="catalog-count">@Model.MediaItems.Count available</span>
+                            </div>
+
+                            <div class="media-choice-grid" id="media-choice-grid">
+                                @for (var index = 0; index < Model.MediaItems.Count; index++)
+                                {
+                                    var mediaItem = Model.MediaItems[index];
+                                    var category = mediaItem.Category;
+                                    <label class="media-choice-card @(index >= 12 ? "is-overflow" : null)"
+                                           data-media-name="@mediaItem.Name.ToLowerInvariant()"
+                                           data-category-id="@mediaItem.ItemTypeId">
+                                        <input type="radio"
+                                               name="MediaItemId"
+                                               value="@mediaItem.Id"
+                                               checked="@(Model.Selection.MediaItemId == mediaItem.Id)"
+                                               data-title="@mediaItem.Name"
+                                               data-category="@(category?.Name ?? "Content")"
+                                               data-year="@mediaItem.ReleaseDate?.Year"
+                                               data-cover="@mediaItem.CoverUrl" />
+                                        <span class="media-choice-cover">
+                                            @if (!string.IsNullOrWhiteSpace(mediaItem.CoverUrl))
+                                            {
+                                                <img src="@mediaItem.CoverUrl" alt="" loading="lazy" referrerpolicy="no-referrer" />
+                                            }
+                                            <span class="cover-fallback" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 15l3-3 3 3 2-2 2 2M8 9h.01" /></svg>
+                                                @(category?.Name ?? "Content")
+                                            </span>
+                                        </span>
+                                        <span class="media-choice-copy">
+                                            <strong>@mediaItem.Name</strong>
+                                            <span>
+                                                <small class="media-type media-type-@(category?.CssClass ?? "movie")">@(category?.Name ?? "Content")</small>
+                                                <small>@mediaItem.ReleaseDate?.Year</small>
+                                            </span>
+                                        </span>
+                                        <span class="selection-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg></span>
+                                    </label>
+                                }
+                            </div>
+
+                            <p class="catalog-empty-message" id="catalog-empty-message" hidden>No titles match your search.</p>
+                            @if (Model.MediaItems.Count > 12)
+                            {
+                                <button type="button" class="text-button catalog-browse" id="browse-media" aria-expanded="false">
+                                    Browse all titles
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                                </button>
+                            }
+                            <p class="field-error" id="media-error" aria-live="polite"></p>
+                        </section>
+
+                        <aside class="experience-summary" aria-labelledby="starting-point-heading">
+                            <p class="summary-kicker">YOUR STARTING POINT</p>
+                            <h2 id="starting-point-heading">Choose something memorable</h2>
+
+                            <div class="experience-summary-cover" id="experience-summary-cover">
+                                <span class="cover-fallback" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 15l3-3 3 3 2-2 2 2M8 9h.01" /></svg>
+                                    WatchPair
+                                </span>
+                            </div>
+                            <h3 id="experience-summary-title">Nothing selected yet</h3>
+                            <p id="experience-summary-meta">Pick a title from the catalog.</p>
+
+                            <button type="submit" class="experience-next-button" id="share-experience-button" disabled>
+                                Share your experience
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+                                <span class="button-spinner" aria-hidden="true"></span>
+                            </button>
+                            <p class="experience-summary-note">Next, tell us how this made you feel.</p>
+                        </aside>
+                    </div>
+                </form>
+            }
+        </main>
+
+        <div class="loading-screen" id="loading-screen" hidden aria-live="polite">
+            <div class="loading-orbit"><span></span><span></span><span></span></div>
+            <strong>Opening your experience...</strong>
+            <p>Getting the mood and theme choices ready.</p>
+        </div>
+    </div>
+
+    <script src="~/js/experience-start.js" asp-append-version="true"></script>
+</body>
+</html>
