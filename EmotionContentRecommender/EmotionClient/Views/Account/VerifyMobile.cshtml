@@ -1,61 +1,122 @@
 @{
-    ViewData["Title"] = "فعال‌سازی موبایل";
-    var mobile = ViewBag.Mobile as string ?? "";
+    Layout = null;
+    ViewData["Title"] = "Verify your mobile";
+    var mobile = ViewBag.Mobile as string ?? string.Empty;
 }
 
-<div class="auth-page">
-    <div class="auth-card">
-        <h2>فعال‌سازی شماره موبایل</h2>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Verify your mobile number to complete your WatchPair account setup." />
+    <title>Verify your mobile — WatchPair</title>
+    <link rel="stylesheet" href="~/css/auth-login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth-otp.css" asp-append-version="true" />
+</head>
+<body class="otp-body">
+    <div class="auth-shell">
+        <header class="auth-header">
+            <a class="brand" asp-controller="Home" asp-action="Index" aria-label="WatchPair home">
+                <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+                <span class="brand-name">WatchPair</span>
+            </a>
+            <a class="home-link" asp-controller="Home" asp-action="Index">
+                Back to Home
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
+            </a>
+        </header>
 
-        @if (ViewBag.Message != null)
-        {
-            <div class="alert alert-success">@ViewBag.Message</div>
-        }
+        <main class="auth-main otp-main">
+            <section class="auth-story otp-story" aria-labelledby="otp-story-title">
+                <img class="story-artwork" src="~/images/auth/login-discovery.webp" asp-append-version="true" alt="" aria-hidden="true" />
+                <div class="story-copy otp-story-copy">
+                    <p class="otp-kicker">ONE QUICK STEP</p>
+                    <h1 id="otp-story-title">Keep your WatchPair account connected.</h1>
+                    <p class="story-description">Verify your mobile number now, then return whenever inspiration finds you.</p>
+                    <div class="otp-trust-note">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-5" /></svg>
+                        <span><strong>Secure verification</strong><small>Your one-time code expires after two minutes.</small></span>
+                    </div>
+                </div>
+            </section>
 
-        <p style="text-align:center;color:#6b7280;margin-bottom:16px;">
-            شماره موبایل: <strong dir="ltr">@mobile</strong>
-        </p>
+            <section class="otp-panel" aria-labelledby="otp-title">
+                <div class="otp-card"
+                     id="otp-card"
+                     data-mobile="@mobile"
+                     data-send-url="@Url.Action("SendOtpAjax", "Account")"
+                     data-verify-url="@Url.Action("VerifyOtpAjax", "Account")"
+                     data-login-url="@Url.Action("Login", "Account")">
+                    <div class="otp-progress" aria-label="Account setup progress">
+                        <span class="is-complete"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg></i>Account created</span>
+                        <span class="progress-line" aria-hidden="true"></span>
+                        <span class="is-current"><i aria-hidden="true">2</i>Mobile verification</span>
+                    </div>
 
-        <div id="otp-message"></div>
+                    <div class="otp-heading">
+                        <p class="otp-kicker">VERIFY YOUR NUMBER</p>
+                        <h2 id="otp-title">Check your phone</h2>
+                        <p>We will send a six-digit code to</p>
+                        <strong dir="ltr">@mobile</strong>
+                    </div>
 
-        <button id="send-otp-btn" class="btn" onclick="sendOtp('@mobile')">
-            ارسال کد تأیید
-        </button>
-        <div id="otp-spinner" class="spinner"></div>
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="auth-alert auth-alert-info otp-server-message" role="status">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10h.01" /></svg>
+                            <span>@ViewBag.Message</span>
+                        </div>
+                    }
 
-        <div id="otp-section" class="otp-section" style="display:none;margin-top:20px;">
-            <h4>کد تأیید ۶ رقمی</h4>
-            <p>کد ارسال‌شده به شماره موبایل خود را وارد کنید</p>
+                    <div class="otp-message" id="otp-message" role="status" aria-live="polite" hidden></div>
 
-            <div class="otp-input-row">
-                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
-                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-            </div>
-            <input type="hidden" id="otp-code-hidden" />
+                    <div class="otp-send-state" id="otp-send-state">
+                        <button type="button" class="submit-button otp-send-button" id="send-otp-button">
+                            <span class="submit-label">Send verification code</span>
+                            <span class="submit-spinner" aria-hidden="true"></span>
+                        </button>
+                        <p>Standard message rates may apply.</p>
+                    </div>
 
-            <div class="otp-timer" id="otp-timer"></div>
+                    <section class="otp-code-section" id="otp-code-section" aria-labelledby="code-heading" hidden>
+                        <div class="otp-code-heading">
+                            <div>
+                                <h3 id="code-heading">Enter your code</h3>
+                                <p>Type or paste all six digits.</p>
+                            </div>
+                            <span id="otp-expiry" aria-live="polite">02:00</span>
+                        </div>
 
-            <button id="verify-otp-btn" class="btn btn-sm" style="margin-top:16px;" onclick="verifyOtp('@mobile')">
-                تأیید کد
-            </button>
-            <div id="verify-spinner" class="spinner"></div>
-            <div id="otp-verify-message"></div>
+                        <div class="otp-input-row" id="otp-input-row" aria-label="Six-digit verification code">
+                            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" aria-label="Digit 1" />
+                            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 2" />
+                            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 3" />
+                            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 4" />
+                            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 5" />
+                            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="Digit 6" />
+                        </div>
+                        <p class="otp-code-error" id="otp-code-error" aria-live="polite"></p>
 
-            <div class="otp-resend" style="margin-top:12px;">
-                <a id="resend-link" class="disabled" onclick="otpSent=false;sendOtp('@mobile')">ارسال مجدد کد</a>
-            </div>
-        </div>
+                        <button type="button" class="submit-button otp-verify-button" id="verify-otp-button" disabled>
+                            <span class="submit-label">Verify and continue</span>
+                            <span class="submit-spinner" aria-hidden="true"></span>
+                        </button>
 
-        <div class="auth-links">
-            <a asp-action="Login">بازگشت به صفحه ورود</a>
-        </div>
+                        <div class="otp-resend">
+                            <span>Didn't receive it?</span>
+                            <button type="button" id="resend-otp-button" disabled>Resend in 01:00</button>
+                        </div>
+                    </section>
+
+                    <div class="register-prompt otp-login-prompt">
+                        <a asp-action="Login">Verify later and sign in</a>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-</div>
 
-@section Scripts {
-    <script src="~/js/site.js" asp-append-version="true"></script>
-}
+    <script src="~/js/auth-otp.js" asp-append-version="true"></script>
+</body>
+</html>

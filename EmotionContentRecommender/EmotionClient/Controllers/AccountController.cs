@@ -14,9 +14,12 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Login()
+    public IActionResult Login(string? returnUrl = null)
     {
-        return View(new LoginViewModel());
+        return View(new LoginViewModel
+        {
+            ReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null
+        });
     }
 
     [HttpPost]
@@ -32,6 +35,9 @@ public class AccountController : Controller
 
         ForwardAuthCookies(result.Cookies);
 
+        if (Url.IsLocalUrl(model.ReturnUrl))
+            return LocalRedirect(model.ReturnUrl);
+
         return RedirectToAction("Index", "Home");
     }
 
@@ -44,30 +50,46 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
+        if (!ModelState.IsValid)
+            return View(model);
+
         var result = await _authApi.RegisterAsync(model);
 
         if (!result.IsSuccess)
         {
-            ViewBag.Error = result.Message ?? "ثبت‌نام ناموفق";
+            ViewBag.Error = result.StatusCode == StatusCodes.Status409Conflict
+                ? "An account with these details already exists. Try a different username, email, or mobile number."
+                : result.StatusCode is StatusCodes.Status502BadGateway
+                    or StatusCodes.Status503ServiceUnavailable
+                    or StatusCodes.Status504GatewayTimeout
+                    ? "Account creation is temporarily unavailable. Please try again shortly."
+                    : "We could not create your account. Check your details and try again.";
             return View(model);
         }
 
         if (!string.IsNullOrEmpty(model.Mobile))
         {
             TempData["RegisteredMobile"] = model.Mobile;
-            TempData["SuccessMessage"] = "ثبت‌نام با موفقیت انجام شد. حالا شماره موبایل خود را فعال کنید.";
+            TempData["SuccessMessage"] = "Your account is ready. Verify your mobile number to finish setup.";
             return RedirectToAction("VerifyMobile");
         }
 
-        TempData["Info"] = "ثبت‌نام با موفقیت انجام شد. اکنون می‌توانید وارد شوید.";
+        TempData["Info"] = "Your account was created successfully. You can sign in now.";
         return RedirectToAction("Login");
     }
 
     [HttpGet]
     public IActionResult VerifyMobile()
     {
-        ViewBag.Mobile = TempData["RegisteredMobile"];
-        ViewBag.Message = TempData["SuccessMessage"];
+        var mobile = TempData.Peek("RegisteredMobile") as string;
+        if (string.IsNullOrWhiteSpace(mobile))
+        {
+            TempData["Info"] = "Sign in to continue to WatchPair.";
+            return RedirectToAction("Login");
+        }
+
+        ViewBag.Mobile = mobile;
+        ViewBag.Message = TempData.Peek("SuccessMessage");
         return View();
     }
 
@@ -82,6 +104,12 @@ public class AccountController : Controller
     public async Task<IActionResult> VerifyOtpAjax([FromBody] VerifyOtpRequest request)
     {
         var result = await _authApi.VerifyOtpAsync(request.Mobile, request.Code);
+        if (result.IsSuccess)
+        {
+            TempData.Remove("RegisteredMobile");
+            TempData.Remove("SuccessMessage");
+        }
+
         return Json(result);
     }
 
@@ -127,8 +155,9 @@ public class AccountController : Controller
             var options = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = Request.IsHttps,
                 SameSite = SameSiteMode.Lax,
+                Path = "/",
                 Expires = name == "access_token"
                     ? DateTimeOffset.UtcNow.AddMinutes(15)
                     : DateTimeOffset.UtcNow.AddDays(7)

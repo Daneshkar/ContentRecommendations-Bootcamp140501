@@ -18,6 +18,12 @@ public sealed class MediaItemGenreConfiguration
             x.GenreId
         });
 
+        builder.HasIndex(x => new
+        {
+            x.GenreId,
+            x.MediaItemId
+        });
+
         builder.HasOne(x => x.MediaItem)
             .WithMany()
             .HasForeignKey(x => x.MediaItemId)

@@ -1,0 +1,49 @@
+@model ExperienceThanksViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Thanks for your feedback";
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Your WatchPair experience has been saved." />
+    <title>@ViewData["Title"] — WatchPair</title>
+    <link rel="stylesheet" href="~/css/recommendation.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="recommendation-shell experience-thanks-page">
+        <partial name="_AppHeader" />
+
+        <main class="experience-thanks-main">
+            <section class="experience-thanks-card">
+                <div class="thanks-orbit" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                    <svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-9" /></svg>
+                </div>
+                <p class="page-kicker">EXPERIENCE SAVED</p>
+                <h1>Thanks for your feedback</h1>
+                <p>
+                    Your @Model.Score-star experience with <strong>@Model.MediaItemName</strong> has been saved.
+                    It helps us make better recommendations for everyone.
+                </p>
+
+                <div class="thanks-impact">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9m6 9V5m6 13v-7m4 7H2" /></svg>
+                    <div>
+                        <strong>Your feedback matters</strong>
+                        <span>Its moods and themes will contribute to WatchPair's recommendation weights.</span>
+                    </div>
+                </div>
+
+                <div class="state-actions">
+                    <a asp-action="Experience" class="details-button">Share another experience</a>
+                    <a asp-controller="Home" asp-action="Index" class="thanks-home-link">Back to Home</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+@using System.Globalization
+@model ExperienceHistoryPageViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Your experience history";
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Revisit the experiences you have shared with WatchPair." />
+    <title>@ViewData["Title"] — WatchPair</title>
+    <link rel="stylesheet" href="~/css/recommendation.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/history.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="recommendation-shell history-page">
+        <partial name="_AppHeader" />
+
+        <main class="history-main">
+            <section class="history-heading" aria-labelledby="history-title">
+                <div>
+                    <p class="page-kicker">YOUR WATCHPAIR JOURNEY</p>
+                    <h1 id="history-title">Your experiences</h1>
+                    <p>Revisit what you watched, read, played, or heard — and how it made you feel.</p>
+                </div>
+
+                @if (Model.ErrorMessage is null && Model.Experiences.Count > 0)
+                {
+                    <div class="history-stats" aria-label="Experience summary">
+                        <div class="history-stat history-stat-total">
+                            <span class="history-stat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 3Z" /></svg>
+                            </span>
+                            <span><strong>@Model.Experiences.Count</strong><small>Experiences</small></span>
+                        </div>
+                        <div class="history-stat history-stat-positive">
+                            <span class="history-stat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z" /></svg>
+                            </span>
+                            <span><strong>@Model.HighlyRatedCount</strong><small>Rated 4 or 5</small></span>
+                        </div>
+                        <div class="history-stat history-stat-moods">
+                            <span class="history-stat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9M8.5 10h.01M15.5 10h.01M8.5 14.5c1.9 1.7 5.1 1.7 7 0" /><path d="M17 3v4m-2-2h4" /></svg>
+                            </span>
+                            <span><strong>@Model.ExploredMoodCount</strong><small>Moods explored</small></span>
+                        </div>
+                    </div>
+                }
+            </section>
+
+            @if (Model.ErrorMessage is not null)
+            {
+                <section class="history-state" role="alert">
+                    <span class="history-state-icon history-state-error" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v6m0 4h.01" /></svg>
+                    </span>
+                    <div>
+                        <p class="page-kicker">HISTORY UNAVAILABLE</p>
+                        <h2>We could not load your experiences</h2>
+                        <p>@Model.ErrorMessage</p>
+                    </div>
+                    <a class="history-primary-action" asp-action="Index">Try again</a>
+                </section>
+            }
+            else if (Model.Experiences.Count == 0)
+            {
+                <section class="history-state history-empty-state">
+                    <span class="history-state-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 3Z" /></svg>
+                    </span>
+                    <div>
+                        <p class="page-kicker">YOUR STORY STARTS HERE</p>
+                        <h2>No experiences yet</h2>
+                        <p>Share something you have watched, read, played, or heard. It will appear here afterward.</p>
+                    </div>
+                    <a class="history-primary-action" asp-controller="Recommendation" asp-action="Experience">Share an experience</a>
+                </section>
+            }
+            else
+            {
+                <section class="history-tools" aria-label="Filter experience history">
+                    <label class="history-search">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                        <span class="sr-only">Search experiences by title, mood, or theme</span>
+                        <input type="search" id="history-search" placeholder="Search titles, moods, or themes..." autocomplete="off" />
+                    </label>
+
+                    <label class="history-select">
+                        <span class="sr-only">Filter by rating</span>
+                        <select id="history-rating">
+                            <option value="all">All ratings</option>
+                            <option value="5">5 stars</option>
+                            <option value="4">4 stars</option>
+                            <option value="3">3 stars</option>
+                            <option value="2">2 stars</option>
+                            <option value="1">1 star</option>
+                        </select>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                    </label>
+
+                    <label class="history-select">
+                        <span class="sr-only">Sort experiences</span>
+                        <select id="history-sort">
+                            <option value="newest">Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                            <option value="highest">Highest rated</option>
+                            <option value="lowest">Lowest rated</option>
+                        </select>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+                    </label>
+                </section>
+
+                <div class="history-result-summary" aria-live="polite">
+                    <span id="history-result-count">@Model.Experiences.Count experiences</span>
+                    <a asp-controller="Recommendation" asp-action="Experience">
+                        Add another experience
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                    </a>
+                </div>
+
+                <section class="history-list" id="history-list" aria-label="Saved experiences">
+                    @foreach (var experience in Model.Experiences)
+                    {
+                        var searchableText = string.Join(" ", new[] { experience.MediaItemName }
+                            .Concat(experience.Moods.Select(item => item.Name))
+                            .Concat(experience.Themes.Select(item => item.Name)));
+                        var dialogId = $"experience-{experience.Id:N}";
+                        var imageLabel = string.IsNullOrWhiteSpace(experience.MediaItemName)
+                            ? "W"
+                            : experience.MediaItemName[..1].ToUpperInvariant();
+
+                        <article class="history-card"
+                                 data-history-card
+                                 data-title="@experience.MediaItemName"
+                                 data-search="@searchableText"
+                                 data-rating="@experience.Score"
+                                 data-created="@experience.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                            <div class="history-cover">
+                                @if (!string.IsNullOrWhiteSpace(experience.MediaItemImageUrl))
+                                {
+                                    <img src="@experience.MediaItemImageUrl"
+                                         alt="Cover artwork for @experience.MediaItemName"
+                                         loading="lazy"
+                                         referrerpolicy="no-referrer" />
+                                }
+                                <span class="history-cover-fallback" aria-hidden="true">
+                                    <strong>@imageLabel</strong>
+                                    <small>WatchPair experience</small>
+                                </span>
+                            </div>
+
+                            <div class="history-card-content">
+                                <div class="history-card-meta">
+                                    <span class="history-badge">EXPERIENCE</span>
+                                    <span>
+                                        <time data-local-time datetime="@experience.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                                            @experience.CreatedAt.ToString("MMM d, yyyy · h:mm tt", CultureInfo.InvariantCulture)
+                                        </time>
+                                        @if (experience.UpdatedAt.HasValue)
+                                        {
+                                            <small>Updated</small>
+                                        }
+                                    </span>
+                                </div>
+
+                                <h2>@experience.MediaItemName</h2>
+
+                                <div class="history-card-details">
+                                    <div class="history-rating-block">
+                                        <span>Your rating</span>
+                                        <div class="history-rating" aria-label="@experience.Score out of 5 stars">
+                                            <strong>@experience.Score <small>/ 5</small></strong>
+                                            <span class="history-stars" aria-hidden="true">
+                                                @for (var star = 1; star <= 5; star++)
+                                                {
+                                                    <svg class="@(star <= experience.Score ? "is-filled" : null)" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" /></svg>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="history-tags-block">
+                                        <span>Moods</span>
+                                        <div class="history-tags">
+                                            @foreach (var mood in experience.Moods)
+                                            {
+                                                <span class="history-tag history-tag-mood">@mood.Name</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="history-tags-block history-theme-block">
+                                        <span>Themes</span>
+                                        <div class="history-tags">
+                                            @if (experience.Themes.Count == 0)
+                                            {
+                                                <span class="history-no-themes">No themes selected</span>
+                                            }
+                                            else
+                                            {
+                                                @foreach (var theme in experience.Themes)
+                                                {
+                                                    <span class="history-tag history-tag-theme">@theme.Name</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="history-card-action">
+                                <span class="history-saved-label">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                                    Saved to your history
+                                </span>
+                                <button type="button" data-dialog-open="@dialogId">View experience</button>
+                            </div>
+                        </article>
+
+                        <dialog class="experience-dialog" id="@dialogId" aria-labelledby="@($"{dialogId}-title")">
+                            <div class="experience-dialog-inner">
+                                <button class="dialog-close" type="button" data-dialog-close aria-label="Close experience details">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                                </button>
+                                <p class="page-kicker">SAVED EXPERIENCE</p>
+                                <h2 id="@($"{dialogId}-title")">@experience.MediaItemName</h2>
+                                <p class="dialog-date">
+                                    Shared <time data-local-time datetime="@experience.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">@experience.CreatedAt.ToString("MMM d, yyyy · h:mm tt", CultureInfo.InvariantCulture)</time>
+                                </p>
+
+                                <div class="dialog-rating">
+                                    <strong>@experience.Score</strong>
+                                    <span>out of 5</span>
+                                </div>
+
+                                <div class="dialog-section">
+                                    <h3>How it made you feel</h3>
+                                    <div class="history-tags">
+                                        @foreach (var mood in experience.Moods)
+                                        {
+                                            <span class="history-tag history-tag-mood">@mood.Name</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                @if (experience.Themes.Count > 0)
+                                {
+                                    <div class="dialog-section">
+                                        <h3>Themes you noticed</h3>
+                                        <div class="history-tags">
+                                            @foreach (var theme in experience.Themes)
+                                            {
+                                                <span class="history-tag history-tag-theme">@theme.Name</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(experience.Note))
+                                {
+                                    <div class="dialog-section dialog-note">
+                                        <h3>Your note</h3>
+                                        <p>@experience.Note</p>
+                                    </div>
+                                }
+                            </div>
+                        </dialog>
+                    }
+                </section>
+
+                <section class="history-filter-empty" id="history-filter-empty" hidden>
+                    <span class="history-state-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></svg>
+                    </span>
+                    <h2>No matching experiences</h2>
+                    <p>Try a different title, mood, theme, or rating.</p>
+                    <button type="button" id="clear-history-filters">Clear filters</button>
+                </section>
+
+                <button class="history-load-more" type="button" id="history-load-more" hidden>Load more</button>
+            }
+        </main>
+    </div>
+
+    <script src="~/js/history.js" asp-append-version="true"></script>
+</body>
+</html>

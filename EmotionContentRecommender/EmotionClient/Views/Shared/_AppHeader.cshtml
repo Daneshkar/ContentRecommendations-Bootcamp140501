@@ -1,0 +1,30 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<header class="app-header">
+    <a class="app-brand" asp-controller="Home" asp-action="Index" aria-label="WatchPair home">
+        <span class="app-brand-mark" aria-hidden="true"><span></span><span></span></span>
+        <span>WatchPair</span>
+    </a>
+
+    <nav class="app-navigation" aria-label="Primary navigation">
+        <a class="@(string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase) ? "is-active" : null)"
+           asp-controller="Home"
+           asp-action="Index"
+           aria-current="@(string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase) ? "page" : null)">Home</a>
+        <a class="@(string.Equals(currentController, "History", StringComparison.OrdinalIgnoreCase) ? "is-active" : null)"
+           asp-controller="History"
+           asp-action="Index"
+           aria-current="@(string.Equals(currentController, "History", StringComparison.OrdinalIgnoreCase) ? "page" : null)">History</a>
+    </nav>
+
+    <div class="app-account">
+        <span class="app-account-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></svg>
+        </span>
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit">Sign out</button>
+        </form>
+    </div>
+</header>

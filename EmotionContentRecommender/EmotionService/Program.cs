@@ -2,6 +2,7 @@
 using EmotionService.Infrastructure.Extensions;
 using EmotionService.Infrastructure.Persistence.Extensions;
 using EmotionService.Infrastructure.Pipeline;
+using FluentValidation;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,15 +17,14 @@ builder.Services.AddMediatR(cfg =>
         typeof(CreateMediaItemCommand).Assembly);
 });
 
+builder.Services.AddValidatorsFromAssembly(
+    typeof(CreateMediaItemCommand).Assembly);
+
 builder.Services.AddScoped(
     typeof(IPipelineBehavior<,>),
     typeof(ValidationPipelineBehavior<,>));
 
 builder.Services.AddInfrastructure(builder.Configuration);
-
-// TODO: JWT authentication is temporarily disabled due to a configuration issue.
-// !The integration flow is implemented, but the JWT settings/validation must be reviewed
-// !with the AuthService implementation before enabling it again.
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();

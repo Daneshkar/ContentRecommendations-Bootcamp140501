@@ -1,4 +1,5 @@
-﻿using EmotionService.Infrastructure.Exceptions;
+﻿using EmotionService.Infrastructure.BackgroundJobs;
+using EmotionService.Infrastructure.Exceptions;
 using EmotionService.Infrastructure.Jwt;
 using EmotionService.Infrastructure.Middlewares;
 using EmotionService.Infrastructure.Persistence;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
@@ -25,6 +27,33 @@ public static class InfrastructureServiceExtensions
                 configuration.GetConnectionString("DefaultConnection"),
                 sql => sql.MigrationsAssembly(
                     typeof(ApplicationDbContext).Assembly.FullName)));
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        services.AddOptions<AggregateWeightJobOptions>()
+            .Bind(configuration.GetSection(
+                AggregateWeightJobOptions.SectionName))
+            .Validate(
+                options => options.Hour is >= 0 and <= 23,
+                "AggregateWeightJob:Hour must be between 0 and 23.")
+            .Validate(
+                options => options.Minute is >= 0 and <= 59,
+                "AggregateWeightJob:Minute must be between 0 and 59.")
+            .Validate(
+                options => !string.IsNullOrWhiteSpace(options.TimeZoneId),
+                "AggregateWeightJob:TimeZoneId is required.")
+            .Validate(
+                options => options.BatchSize is >= 1 and <= 10_000,
+                "AggregateWeightJob:BatchSize must be between 1 and 10000.")
+            .Validate(
+                options => options.MaxBatchesPerRun is >= 1 and <= 1_000,
+                "AggregateWeightJob:MaxBatchesPerRun must be between 1 and 1000.")
+            .ValidateOnStart();
+
+        services.AddScoped<AggregateWeightQueue>();
+        services.AddScoped<AggregateWeightProcessor>();
+        services.AddHostedService<AggregateWeightBackgroundService>();
 
         return services;
     }
@@ -77,6 +106,20 @@ public static class InfrastructureServiceExtensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        var logger = ctx.HttpContext.RequestServices
+                            .GetRequiredService<ILoggerFactory>()
+                            .CreateLogger("JwtAuthentication");
+
+                        logger.LogError(
+                            ctx.Exception,
+                            "JWT authentication failed. ExceptionType: {ExceptionType}",
+                            ctx.Exception.GetType().Name);
+
+                        return Task.CompletedTask;
+                    },
+
                     OnMessageReceived = ctx =>
                     {
                         if (ctx.Request.Cookies.TryGetValue(

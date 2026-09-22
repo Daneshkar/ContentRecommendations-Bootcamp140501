@@ -18,6 +18,34 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<MediaItemGenre> MediaItemGenres => Set<MediaItemGenre>();
 
+    public DbSet<MusicDetail> MusicDetails => Set<MusicDetail>();
+
+    public DbSet<MovieDetail> MovieDetails => Set<MovieDetail>();
+
+    public DbSet<GameDetail> GameDetails => Set<GameDetail>();
+
+    public DbSet<BookDetail> BookDetails => Set<BookDetail>();
+    public DbSet<Theme> Themes => Set<Theme>();
+
+    public DbSet<ItemMoodWeight> ItemMoodWeights
+    => Set<ItemMoodWeight>();
+
+    public DbSet<ItemThemeWeight> ItemThemeWeights
+    => Set<ItemThemeWeight>();
+
+    public DbSet<Experience> Experiences
+    => Set<Experience>();
+
+    public DbSet<ExperienceMood> ExperienceMoods
+        => Set<ExperienceMood>();
+
+    public DbSet<ExperienceTheme> ExperienceThemes
+        => Set<ExperienceTheme>();
+
+    public DbSet<PendingMediaItemWeightUpdate>
+        PendingMediaItemWeightUpdates
+        => Set<PendingMediaItemWeightUpdate>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(

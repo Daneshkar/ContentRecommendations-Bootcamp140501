@@ -1,5 +1,6 @@
 using System.Text.Json;
 using EmotionService.Infrastructure.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -42,6 +43,26 @@ public class ExceptionHandlingMiddleware
 
         switch (exception)
         {
+            case ValidationException validationException:
+                var validationErrors = validationException.Errors
+                    .GroupBy(error => ToCamelCase(error.PropertyName))
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group
+                            .Select(error => error.ErrorMessage)
+                            .Distinct()
+                            .ToArray());
+
+                _logger.LogWarning(
+                    "ValidationException | TraceId: {TraceId} | ErrorCount: {ErrorCount}",
+                    traceId,
+                    validationErrors.Count);
+
+                response = ErrorResponse.Validation(
+                    validationErrors,
+                    traceId);
+                break;
+
             case BusinessException bex:
                 _logger.LogWarning(
                     "BusinessException | TraceId: {TraceId} | Code: {Code} | {Message}",
@@ -82,5 +103,17 @@ public class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode  = response.Status;
         await context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
+    }
+
+    private static string ToCamelCase(string propertyName)
+    {
+        if (string.IsNullOrEmpty(propertyName)
+            || char.IsLower(propertyName[0]))
+        {
+            return propertyName;
+        }
+
+        return char.ToLowerInvariant(propertyName[0])
+            + propertyName[1..];
     }
 }
